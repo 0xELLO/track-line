@@ -46,9 +46,9 @@ public class AccountController : ControllerBase
     // TODO change password method
     // TODO change username?? method (firstly add username)
     // TODO change email method
-    // TODO remove context!!! + RefreshToken Service!!1
+    // TODO remove context!!! + RefreshToken Service!!1 finished?
     // TODO error descriptions
-    // TODO Api error description over standard errors (do i need traceId)
+    // TODO Api error description over standard errors (do i need traceId Mark prochitai pro traceId)
 
     /// <summary>
     /// AppUser authentication 
@@ -113,21 +113,14 @@ public class AccountController : ControllerBase
             );
 
         // old refresh token load
-        
+        /*
         appUser.RefreshTokens = await _context
             .Entry(appUser)
             .Collection(a => a.RefreshTokens!)
             .Query()
             .Where(t => t.AppUserId == appUser.Id)
             .ToListAsync();
-        
-        
-        /*
-        appUser.RefreshTokens =
-            (await _bll.RefreshTokenService.GetValidRefreshTokensByUserIdAsync(appUser.Id.ToString())).Select(x =>);
-        */
-        
-        
+            
         foreach (var appUserRefreshToken in appUser.RefreshTokens)
         {
             if (appUserRefreshToken.ExpirationTime < DateTime.UtcNow
@@ -136,11 +129,25 @@ public class AccountController : ControllerBase
                 _context.RefreshToken.Remove(appUserRefreshToken);
             }
         }
+        */
+        
+        // new refresh token load
+        appUser.RefreshTokens = (await _bll.RefreshTokenService
+            .GetValidRefreshTokensByUserIdAsync(appUser.Id.ToString()))
+            .Select(x => new RefreshToken
+            {
+                Id = x.Id,
+                Token = x.Token,
+                ExpirationTime = x.ExpirationTime,
+                PreviousToken = x.PreviousToken,
+                PreviousExpirationTime = x.PreviousExpirationTime,
+                AppUserId = x.AppUserId,
+            }).ToList();
 
-        var refreshToken = new RefreshToken();
+
+        var refreshToken = new App.BLL.DTO.Identity.RefreshTokenDTO();
         refreshToken.AppUserId = appUser.Id;
-        _context.RefreshToken.Add(refreshToken);
-        await _context.SaveChangesAsync();
+        await _bll.SaveChangesAsync();
 
         var res = new JwtResponse()
         {
@@ -249,9 +256,9 @@ public class AccountController : ControllerBase
         
         // add role user (system will do it)
         var result2 = await _userManager.AddToRoleAsync(appUser, AppUserRoles.User.ToString());
-        if (!result.Succeeded)
+        if (!result2.Succeeded)
         {
-            return BadRequest(result.Errors.FirstOrDefault());
+            return BadRequest(result2.Errors.FirstOrDefault());
         }
         
         // get full user from system with fixed ddata
@@ -327,14 +334,29 @@ public class AccountController : ControllerBase
         {
             return BadRequest($"User with email {userEmail} not found");
         }
-        
-        // load and compare refresh tokens
+
+        // old load and compare refresh tokens
+        /*
         await _context.Entry(appUser).Collection(u => u.RefreshTokens!)
             .Query()
             .Where(x =>
                 (x.Token == refreshTokenModel.RefreshToken && x.ExpirationTime > DateTime.UtcNow) ||
                 (x.PreviousToken == refreshTokenModel.RefreshToken && x.PreviousExpirationTime > DateTime.UtcNow))
             .ToListAsync();
+        */
+        
+        // new load and compare refresh tokens
+        appUser.RefreshTokens = (await _bll.RefreshTokenService.GetValidRefreshTokensByUserIdAsync(appUser.Id.ToString(),
+            refreshTokenModel.RefreshToken)).Select(x => new RefreshToken
+        {
+            Id = x.Id,
+            Token = x.Token,
+            ExpirationTime = x.ExpirationTime,
+            PreviousToken = x.PreviousToken,
+            PreviousExpirationTime = x.PreviousExpirationTime,
+            AppUserId = x.AppUserId,
+        }).ToList();
+        
         
         if (appUser.RefreshTokens == null)
         {

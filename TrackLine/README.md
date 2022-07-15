@@ -1,5 +1,10 @@
 # TrackLine operations
 
+## Dotnet
+~~~sh
+dotnet install
+~~~
+
 ## Database operations
 ~~~sh
 dotnet ef migrations add --project App.DAL.EF --startup-project WebApp --context AppDbContext Initial
@@ -13,23 +18,21 @@ dotnet ef database drop --project App.DAL.EF --startup-project WebApp
 
 ## Scaffolding
 
-### Controllers
-
-#### Web Controllers
+### Web Controllers
 ~~~sh
 cd WebApp
 dotnet aspnet-codegenerator controller -name !!NAME + Controller       -actions -m  App.Domain.!!NAME    -dc AppDbContext -outDir Areas\Admin\Controllers --useDefaultLayout --useAsyncActions --referenceScriptLibraries -f
 dotnet aspnet-codegenerator controller -name UserRoundResultConroller      -actions -m  App.Domain.UserRoundResult   -dc AppDbContext -outDir Areas\Admin\Controllers --useDefaultLayout --useAsyncActions --referenceScriptLibraries -f
 ~~~
 
-#### API Controllers
+### API Controllers
 ~~~sh
 cd WebApp
 dotnet aspnet-codegenerator controller -name !!Name + Controller     -m App.Domain.!!NAME     -actions -dc AppDbContext -outDir ApiControllers -api --useAsyncActions  -f
 dotnet aspnet-codegenerator controller -name UserGameStatisticsController    -m App.Domain.UserGameStatistics    -actions -dc AppDbContext -outDir ApiControllers -api --useAsyncActions  -f
 ~~~
 
-#### Web Pages
+### Web Pages
 ~~~sh
 cd WebApp
 dotnet aspnet-codegenerator razorpage -m !!Name -dc AppDbContext -udl -outDir Pages/!!DomainName  --referenceScriptLibraries

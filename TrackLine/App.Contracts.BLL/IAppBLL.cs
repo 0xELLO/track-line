@@ -6,6 +6,7 @@ namespace App.Contracts.BLL;
 
 public interface IAppBLL : IBLL
 {
+    IListItemService ListItemService { get; }
     IFooBarService FooBarService { get; }
     IRefreshTokenService RefreshTokenService { get; }
 }

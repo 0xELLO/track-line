@@ -1,0 +1,78 @@
+
+
+
+
+
+
+
+
+
+.wrapper {
+    background-color: teal;
+  }
+
+.eye-shape {
+    margin: 0 auto;
+    width: 300px;
+    height: 300px;
+    background-color: rgba(0,0,0,.5);
+    border-radius: 100% 0px;
+    transform: rotate(45deg); 
+}
+
+.shade {
+    width: 100%;
+    height: 100%;
+    background-color: #bbb;
+    border-radius: 100% 3px 100% 0px;
+    animation: blink 2s cubic-bezier(.65,.05,.36,1) infinite;
+}
+
+@keyframes blink {
+    
+}
+
+
+
+
+.pupil {
+    height: 40px;
+    width: 40px;
+    background-color: #bbb;
+    border-radius: 50%;
+    display: inline-block;
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    animation: move-pupil 2s cubic-bezier(.65,.05,.36,1) infinite;
+}
+
+
+@keyframes move-pupil {
+    50% {
+        transform: translateX(44%);
+    }
+}
+
+
+
+
+
+.parent {
+    background-color: aqua;
+    height: 300px;
+    width: 300px;
+}
+
+.child {
+    background-color: red;
+    height: 10%;
+    width: 10%;
+}
+
+.parent:hover .child {
+    transform: translateX(1000%);
+}

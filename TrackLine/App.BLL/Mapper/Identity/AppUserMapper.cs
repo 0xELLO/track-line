@@ -3,7 +3,7 @@ using Base.DAL;
 
 namespace App.BLL.Mapper.Identity;
 
-public class AppUserMapper : BaseMapper<App.BLL.DTO.Identity.AppUser, App.DAL.DTO.Identity.AppUser>
+public class AppUserMapper : BaseMapper<App.BLL.DTO.Identity.AppUserDTO, App.DAL.DTO.Identity.AppUserDTO>
 {
     public AppUserMapper(IMapper mapper) : base(mapper)
     {

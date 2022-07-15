@@ -4,6 +4,7 @@ using App.BLL.Services;
 using App.Contracts.BLL;
 using App.Contracts.BLL.Services;
 using App.Contracts.DAL;
+using App.Contracts.DAL.Repositories.List;
 using AutoMapper;
 using Base.BLL;
 
@@ -32,12 +33,17 @@ public class AppBLL : BaseBLL<IAppUnitOfWork>, IAppBLL
 
 
     private IFooBarService? _fooBarService;
-    public IFooBarService FooBarService => _fooBarService ??= new FooBarService(UnitOfWork.FooBarRepository, new FooBarMapper(_mapper));
+    public IFooBarService FooBarService => _fooBarService ??= new FooBarService(UnitOfWork.IFooBarRepository, new FooBarMapper(_mapper));
     
     
     
     private IRefreshTokenService? _refreshTokenService;
-    public IRefreshTokenService RefreshTokenService => _refreshTokenService ??= new RefreshTokenService(UnitOfWork.RefreshTokenRepository, new RefreshTokenMapper(_mapper));
+    public IRefreshTokenService RefreshTokenService => _refreshTokenService ??= new RefreshTokenService(UnitOfWork.IRefreshTokenRepository, new RefreshTokenMapper(_mapper));
+    
+    
+    private IListItemService? _listItemService;
+    public IListItemService ListItemService => _listItemService ??= new ListItemService(UnitOfWork.IListItemRepository,
+        UnitOfWork.IListItemInSubListRepository, UnitOfWork.IUserListItemProgressRepository);
     
     
 }
