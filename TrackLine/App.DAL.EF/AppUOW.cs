@@ -24,29 +24,29 @@ public class AppUOW : BaseUOW<AppDbContext>, IAppUnitOfWork
     }
 
     private IFooBarRepository? _fooBarRepository;
-    public virtual IFooBarRepository IFooBarRepository => _fooBarRepository ??= new FooBarRepository(UOWDbContext, new FooBarMapper(_mapper));
+    public virtual IFooBarRepository FooBarRepository => _fooBarRepository ??= new FooBarRepository(UOWDbContext, new FooBarMapper(_mapper));
     
     private IRefreshTokenRepository? _refreshTokenRepository;
-    public virtual IRefreshTokenRepository IRefreshTokenRepository => _refreshTokenRepository ??= new RefreshTokenRepository(UOWDbContext, new RefreshTokenMapper(_mapper));
+    public virtual IRefreshTokenRepository RefreshTokenRepository => _refreshTokenRepository ??= new RefreshTokenRepository(UOWDbContext, new RefreshTokenMapper(_mapper));
     
     
     
     private IHeadListRepository? _headListRepository;
-    public virtual IHeadListRepository IHeadListRepository => _headListRepository ??= new HeadListRepository(UOWDbContext, new HeadListMapper(_mapper));
+    public virtual IHeadListRepository HeadListRepository => _headListRepository ??= new HeadListRepository(UOWDbContext, new HeadListMapper(_mapper));
 
 
     private IListItemInSubListRepository? _listItemInSubListRepository;
-    public virtual IListItemInSubListRepository IListItemInSubListRepository => _listItemInSubListRepository ??= new ListItemInSubListRepository(UOWDbContext, new ListItemInSubListMapper(_mapper));
+    public virtual IListItemInSubListRepository ListItemInSubListRepository => _listItemInSubListRepository ??= new ListItemInSubListRepository(UOWDbContext, new ListItemInSubListMapper(_mapper));
     
         
     private IListItemRepository? _listItemRepository;
-    public virtual IListItemRepository IListItemRepository => _listItemRepository ??= new ListItemRepository(UOWDbContext, new ListItemMapper(_mapper));
+    public virtual IListItemRepository ListItemRepository => _listItemRepository ??= new ListItemRepository(UOWDbContext, new ListItemMapper(_mapper));
     
         
     private ISubListRepository? _subListRepository;
-    public virtual ISubListRepository ISubListRepository => _subListRepository ??= new SubListRepository(UOWDbContext, new SubListMapper(_mapper));
+    public virtual ISubListRepository SubListRepository => _subListRepository ??= new SubListRepository(UOWDbContext, new SubListMapper(_mapper));
     
         
     private IUserListItemProgressRepository? _userListItemProgressRepository;
-    public virtual IUserListItemProgressRepository IUserListItemProgressRepository => _userListItemProgressRepository ??= new UserListItemProgressRepository(UOWDbContext, new UserListItemProgressMapper(_mapper));
+    public virtual IUserListItemProgressRepository UserListItemProgressRepository => _userListItemProgressRepository ??= new UserListItemProgressRepository(UOWDbContext, new UserListItemProgressMapper(_mapper));
 }

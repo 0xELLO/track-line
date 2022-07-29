@@ -15,6 +15,8 @@ public class RefreshTokenService : BaseEntityService<App.BLL.DTO.Identity.Refres
         base(repository, mapper)
     {
     }
+    
+    // TODO Fix the service (i don't know why it doesn't work)
 
     public async Task<IEnumerable<RefreshTokenDTO?>> GetRefreshTokensByUserIdAsync(string appUserId, bool noTracking = true)
     {
@@ -39,6 +41,7 @@ public class RefreshTokenService : BaseEntityService<App.BLL.DTO.Identity.Refres
 
     public async Task RemoveInvalidUserTokensAsync(string appUserId, bool noTracking = true)
     {
+        // TODO Will removing all invalid tokens removes posability to logging with multiple devices
         var tokens = await Repository.GetRefreshTokensByUserIdAsync(appUserId, noTracking);
         var invalidTokens = tokens.Where(t => t != null
                                               && t.ExpirationTime < DateTime.UtcNow &&

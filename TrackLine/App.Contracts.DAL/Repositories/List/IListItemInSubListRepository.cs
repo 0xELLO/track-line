@@ -10,4 +10,5 @@ public interface IListItemInSubListRepository: IEntityRepository<App.DAL.DTO.Lis
 
 public interface IListItemInSubListRepositoryCustom<TEntity>
 {
+    public Task<IEnumerable<TEntity>> GetAllBySubListId(string subListId, bool noTracking = true);
 }

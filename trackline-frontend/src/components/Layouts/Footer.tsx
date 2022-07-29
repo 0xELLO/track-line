@@ -1,26 +1,18 @@
-import React from 'react'
-import '../../styles/EyeAnimation.css'
+import React from "react";
+import "../../styles/EyeAnimation.css";
 
-
-import { useLogin } from '../../context/LoginStateContext'
-
-
+import { useLogin } from "../../context/AuthStateContext";
 
 const Footer = () => {
-  const LoginContext = useLogin();  
+  const LoginContext = useLogin();
   return (
     <>
-        <div>{LoginContext ? "adsf" : "adf"}</div>
-            <div className="container">
-      <div className="eyeBall">
-        <div className="iris"></div>
+      <div className="container fixed-bottom">
+        <div>Footer: Login State: {LoginContext ? "LoggedIn" : "LoggedOut"} </div>
+        <br/>
       </div>
-      <div className="eyeLid"></div>
-      <div className="lid"></div>
-    </div>
     </>
+  );
+};
 
-  )
-}
-
-export default Footer
+export default Footer;

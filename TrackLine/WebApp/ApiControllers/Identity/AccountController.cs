@@ -75,7 +75,7 @@ public class AccountController : ControllerBase
                 }
             }
         };
-
+        
         // verify username
         var appUser = await _userManager.FindByEmailAsync(loginModelData.Email);
         if (appUser == null)
@@ -235,6 +235,7 @@ public class AccountController : ControllerBase
             }
         };
         
+        // TODO rewrite mail validation
         var trimmedEmail = appUser.Email.Trim();
         try {
             var addr = new System.Net.Mail.MailAddress(appUser.Email);

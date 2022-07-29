@@ -7,7 +7,7 @@ public class SubList : DomainEntityMetaId
 {
     // FK HeadList
     public HeadList HeadList { get; set; } = default!;
-    public string HeadListId { get; set; } = default!;
+    public Guid HeadListId { get; set; } = default!;
     
     // Used as a default translation name (eng) or in user created objects
     [MaxLength(128)]

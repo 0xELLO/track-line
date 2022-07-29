@@ -1,4 +1,57 @@
-# TrackLine operations
+# TrackLine project structure
+
+# General project structure
+
+![alt text](https://i.imgur.com/X5lPFMU.jpeg)
+
+- DAL - data access layer
+- BLL - business logic layer
+- API - application programming interface
+- DTO - data transfer object
+
+Structure is divided into 3 layers. Every layers has ints own object structure (DTO) it works with.
+Communication between different layer DTOs is established using mappers.
+
+- AutoMapper - uses a programming concept called Reflection to retrieve the type metadata of objects.
+Reflection can be used to dynamically get the type from an existing object and invoke its methods or access its fields and properties.
+Then, based on the conventions and configurations defined, AutoMapper can easily map the properties of the two types
+
+
+## DAL
+- DAL - represents low level data access using Entity Framework. DAL contains Repositories, central place in which an aggregation of data is kept and maintained in an organized way.
+
+- Repository Pattern separates the data access logic and maps it to the entities in the business logic. It works with the domain entities and performs data access logic, typically CRUD methods
+
+- It is not a good idea to access the database logic directly in the business logic. Tight coupling of the database logic in the business logic make applications tough to test and extend further.
+
+- Why?:
+    - Business logic is hard to unit test.
+    - Business logic cannot be tested without the dependencies of external systems like database
+    - Duplicate data access code throughout the business layer (Don’t Repeat Yourself in code – DRY principle)
+
+## BLL
+- BLL - represents complex data manipulation and access. BLL contains Services.
+- Sometimes you need even more granularity in your data access – Data Access Objects are often used as low-level, single technology based data source.
+  
+- What should be in service layer?
+
+  - Using multiple repos to compose one response
+  - Doing something other than direct repo usage
+    - Storing uploaded data to filesystem
+    - Requests from external sources
+
+- Why?:
+  - One service can use as many repos as needed
+  - Also access other services
+  - Data validation and access is moved from controllers to the service layer
+  - Data caching is more effective
+
+## API
+- Api - layer that provide communication between client and application/server
+- Api must support versioning. It's critical that clients can count on services to be stable over time, and it's critical that services can add features and make changes.
+- Principle of Least Astonishment The principle means that a component of a system should behave in a way that most users will expect it to behave; the behavior should not astonish or surprise users.
+
+# Useful operations
 
 ## Dotnet
 ~~~sh
@@ -7,7 +60,7 @@ dotnet install
 
 ## Database operations
 ~~~sh
-dotnet ef migrations add --project App.DAL.EF --startup-project WebApp --context AppDbContext Initial
+dotnet ef migrations add --project App.DAL.EF --startup-project WebApp --context AppDbContext Initial2
 
 dotnet ef migrations remove --project App.DAL.EF --startup-project WebApp --context AppDbContext
 

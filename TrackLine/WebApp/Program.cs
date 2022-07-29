@@ -34,13 +34,13 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // Add repositories to sync DbContext
 builder.Services.AddScoped<IAppUnitOfWork, AppUOW>();
 builder.Services.AddScoped<IAppBLL, AppBLL>();
-builder.Services.AddScoped<WebAutoMapper, WebAutoMapper>();
+builder.Services.AddScoped<Mapper, Mapper>();
 
 // Add mapper configurations
 builder.Services.AddAutoMapper(
     typeof(App.DAL.EF.AutoMapperConfig),
     typeof(App.BLL.AutoMapperConfig),
-    typeof(WebAutoMapper));
+    typeof(Mapper));
 
 // hz
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();

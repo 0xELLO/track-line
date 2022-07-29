@@ -8,7 +8,7 @@ public class HeadList : DomainEntityMetaId
 {
     // FK AppUser
     public AppUser AppUser { get; set; } = default!;
-    public string AppUserId { get; set; } = default!;
+    public Guid AppUserId { get; set; } = default!;
     
     // Used as a default translation name (eng) or in user created objects
     [MaxLength(128)]

@@ -1,6 +1,8 @@
-﻿namespace App.BLL.DTO.List;
+﻿using Base.Domain;
 
-public class ExtendedListItemDTO
+namespace App.BLL.DTO.List;
+
+public class ExtendedListItemDTO : DomainEntityId
 {
     // Used as a default translation name (eng) or in user created objects
     public string DefaultTitle { get; set; } = default!;

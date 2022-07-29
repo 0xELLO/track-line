@@ -20,5 +20,8 @@ public class RefreshTokenRepository : BaseEntityRepository<App.DAL.DTO.Identity.
         var query = CreateQuery(noTracking);
         return (await query.Where(a => a.AppUserId.ToString() == appUserId)
             .ToListAsync()).Select(x => Mapper.Map(x));
+        
+        
+        // List Refresh => refresh appUserId == appUserId
     }
 }

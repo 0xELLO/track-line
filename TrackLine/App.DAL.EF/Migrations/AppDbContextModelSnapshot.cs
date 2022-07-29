@@ -15,7 +15,7 @@ namespace App.DAL.EF.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "6.0.5");
+            modelBuilder.HasAnnotation("ProductVersion", "6.0.6");
 
             modelBuilder.Entity("App.Domain.FooBar", b =>
                 {
@@ -169,6 +169,208 @@ namespace App.DAL.EF.Migrations
                     b.ToTable("RefreshToken");
                 });
 
+            modelBuilder.Entity("App.Domain.List.HeadList", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("AppUserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CratedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CratedBy")
+                        .HasMaxLength(32)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DefaultTitle")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasMaxLength(32)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AppUserId");
+
+                    b.ToTable("HeadList");
+                });
+
+            modelBuilder.Entity("App.Domain.List.ListItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CratedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CratedBy")
+                        .HasMaxLength(32)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DefaultTitle")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsCreatedByUser")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsPublic")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("TotalLength")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasMaxLength(32)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ListItem");
+                });
+
+            modelBuilder.Entity("App.Domain.List.ListItemInSubList", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CratedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CratedBy")
+                        .HasMaxLength(32)
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ListItemId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ListObjectId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Position")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("SubListId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasMaxLength(32)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ListItemId");
+
+                    b.HasIndex("SubListId");
+
+                    b.ToTable("ListItemInSubList");
+                });
+
+            modelBuilder.Entity("App.Domain.List.SubList", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CratedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CratedBy")
+                        .HasMaxLength(32)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DefaultTitle")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("HeadListId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsPublic")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasMaxLength(32)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("HeadListId");
+
+                    b.ToTable("SubList");
+                });
+
+            modelBuilder.Entity("App.Domain.List.UserListItemProgress", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("AppUserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CratedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CratedBy")
+                        .HasMaxLength(32)
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ListItemId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ListObjectId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Progress")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("TimesFinished")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasMaxLength(32)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AppUserId");
+
+                    b.HasIndex("ListItemId");
+
+                    b.ToTable("UserListItemProgress");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.Property<int>("Id")
@@ -279,6 +481,66 @@ namespace App.DAL.EF.Migrations
                     b.Navigation("AppUser");
                 });
 
+            modelBuilder.Entity("App.Domain.List.HeadList", b =>
+                {
+                    b.HasOne("App.Domain.Identity.AppUser", "AppUser")
+                        .WithMany("HeadLists")
+                        .HasForeignKey("AppUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("AppUser");
+                });
+
+            modelBuilder.Entity("App.Domain.List.ListItemInSubList", b =>
+                {
+                    b.HasOne("App.Domain.List.ListItem", "ListItem")
+                        .WithMany("ListObjectsInSubList")
+                        .HasForeignKey("ListItemId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("App.Domain.List.SubList", "SubList")
+                        .WithMany("ListObjectsInSubList")
+                        .HasForeignKey("SubListId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ListItem");
+
+                    b.Navigation("SubList");
+                });
+
+            modelBuilder.Entity("App.Domain.List.SubList", b =>
+                {
+                    b.HasOne("App.Domain.List.HeadList", "HeadList")
+                        .WithMany("SubLists")
+                        .HasForeignKey("HeadListId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("HeadList");
+                });
+
+            modelBuilder.Entity("App.Domain.List.UserListItemProgress", b =>
+                {
+                    b.HasOne("App.Domain.Identity.AppUser", "AppUser")
+                        .WithMany("UserListObjectProgresses")
+                        .HasForeignKey("AppUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("App.Domain.List.ListItem", "ListItem")
+                        .WithMany("UserListObjectProgresses")
+                        .HasForeignKey("ListItemId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("AppUser");
+
+                    b.Navigation("ListItem");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.HasOne("App.Domain.Identity.AppRole", null)
@@ -332,7 +594,28 @@ namespace App.DAL.EF.Migrations
 
             modelBuilder.Entity("App.Domain.Identity.AppUser", b =>
                 {
+                    b.Navigation("HeadLists");
+
                     b.Navigation("RefreshTokens");
+
+                    b.Navigation("UserListObjectProgresses");
+                });
+
+            modelBuilder.Entity("App.Domain.List.HeadList", b =>
+                {
+                    b.Navigation("SubLists");
+                });
+
+            modelBuilder.Entity("App.Domain.List.ListItem", b =>
+                {
+                    b.Navigation("ListObjectsInSubList");
+
+                    b.Navigation("UserListObjectProgresses");
+                });
+
+            modelBuilder.Entity("App.Domain.List.SubList", b =>
+                {
+                    b.Navigation("ListObjectsInSubList");
                 });
 #pragma warning restore 612, 618
         }

@@ -8,11 +8,11 @@ public class UserListItemProgress : DomainEntityMetaId
 {
     // FK ListObject
     public ListItem ListItem { get; set; } = default!;
-    public string ListObjectId { get; set; } = default!;
+    public Guid ListObjectId { get; set; } = default!;
     
     // FK AppUser
     public AppUser AppUser { get; set; } = default!;
-    public string AppUserId { get; set; } = default!;
+    public Guid AppUserId { get; set; } = default!;
 
     [Range(0, 9999)]
     public int Progress { get; set; } = 0;

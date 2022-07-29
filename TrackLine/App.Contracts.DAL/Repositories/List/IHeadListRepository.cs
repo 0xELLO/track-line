@@ -10,4 +10,5 @@ public interface IHeadListRepository: IEntityRepository<App.DAL.DTO.List.HeadLis
 
 public interface IHeadListRepositoryCustom<TEntity>
 {
+    public Task<IEnumerable<TEntity>> getHeadListsByUserId(string userId, bool noTracking = true);
 }

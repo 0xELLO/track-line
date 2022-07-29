@@ -7,11 +7,11 @@ namespace App.Contracts.DAL;
 
 public interface IAppUnitOfWork : IUnitOfWork
 {
-    IHeadListRepository IHeadListRepository { get; }
-    IListItemInSubListRepository IListItemInSubListRepository { get; }
-    IListItemRepository IListItemRepository { get; }
-    ISubListRepository ISubListRepository { get; }
-    IUserListItemProgressRepository IUserListItemProgressRepository { get; }
-    IFooBarRepository IFooBarRepository { get;  }
-    IRefreshTokenRepository IRefreshTokenRepository { get; }
+    IHeadListRepository HeadListRepository { get; }
+    IListItemInSubListRepository ListItemInSubListRepository { get; }
+    IListItemRepository ListItemRepository { get; }
+    ISubListRepository SubListRepository { get; }
+    IUserListItemProgressRepository UserListItemProgressRepository { get; }
+    IFooBarRepository FooBarRepository { get;  }
+    IRefreshTokenRepository RefreshTokenRepository { get; }
 }

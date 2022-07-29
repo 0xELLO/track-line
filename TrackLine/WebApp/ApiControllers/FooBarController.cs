@@ -26,18 +26,18 @@ namespace WebApp.ApiControllers;
 [ApiVersion("1.0")]
 [Route("api/v{version:apiVersion}/[controller]")]
 [ApiController]
-//[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public class FooBarController : ControllerBase
 {
     private readonly IAppBLL _bll;
     private readonly ILogger<FooBarController> _logger;
-    private readonly WebAutoMapper _webAutoMapper;
+    private readonly Mapper _mapper;
 
-    public FooBarController(IAppBLL bll, ILogger<FooBarController> logger, WebAutoMapper webAutoMapper)
+    public FooBarController(IAppBLL bll, ILogger<FooBarController> logger, Mapper mapper)
     {
         _bll = bll;
         _logger = logger;
-        _webAutoMapper = webAutoMapper;
+        _mapper = mapper;
     }
 
     /// <summary>
@@ -50,7 +50,7 @@ public class FooBarController : ControllerBase
     public async Task<ActionResult<IEnumerable<App.Public.DTO.v1.FooBar>>> GetFooBar()
     {
         var fooBarBll = (await _bll.FooBarService.GetAllAsync());
-        var fooBar = fooBarBll.Select(bll => _webAutoMapper.FooBarMapper.Map(bll));    
+        var fooBar = fooBarBll.Select(bll => _mapper.FooBarMapper.Map(bll));    
         return Ok(fooBar);
     }
     
@@ -74,7 +74,7 @@ public class FooBarController : ControllerBase
         {
             return NotFound();
         }
-        return Ok(_webAutoMapper.FooBarMapper.Map(game));
+        return Ok(_mapper.FooBarMapper.Map(game));
     }
     
     /// <summary>
@@ -94,7 +94,7 @@ public class FooBarController : ControllerBase
             return BadRequest();
         }
 
-        var fooBarBll = _webAutoMapper.FooBarMapper.Map(fooBar);
+        var fooBarBll = _mapper.FooBarMapper.Map(fooBar);
         if (fooBarBll == null)
         {
             return NotFound("incorrect base");
@@ -129,7 +129,7 @@ public class FooBarController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<FooBar>> PostFooBar(App.Public.DTO.v1.FooBar fooBar)
     {
-        var fooBarBll = _webAutoMapper.FooBarMapper.Map(fooBar);
+        var fooBarBll = _mapper.FooBarMapper.Map(fooBar);
         if (fooBarBll == null)
         {
             return NotFound("incorrect base");
@@ -138,7 +138,7 @@ public class FooBarController : ControllerBase
         var result = _bll.FooBarService.Add(fooBarBll);
         await _bll.SaveChangesAsync();
         
-        return Ok(_webAutoMapper.FooBarMapper.Map(result));
+        return Ok(_mapper.FooBarMapper.Map(result));
     }
     /// <summary>
     /// Deletes FooBar

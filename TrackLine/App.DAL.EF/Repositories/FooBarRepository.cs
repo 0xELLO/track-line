@@ -13,7 +13,7 @@ public class FooBarRepository : BaseEntityRepository<App.DAL.DTO.FooBar, App.Dom
     {
     }
 
-    public async Task<IEnumerable<FooBar?>> GetAllByNameAsync(string name, bool noTracking = true)
+    public async Task<IEnumerable<FooBar?>> GetAllByNameAsync(string? name, bool noTracking = true)
     {
         var query = CreateQuery(noTracking);
         return (await query.Where(a => a.Name.ToUpper() == name)
@@ -23,6 +23,7 @@ public class FooBarRepository : BaseEntityRepository<App.DAL.DTO.FooBar, App.Dom
     public async Task<FooBar?> GetByNameAsync(string name, bool noTracking = true)
     {
         var query = CreateQuery(noTracking);
+        var a = await query.FirstAsync(a => a.Name == "a");
         return Mapper.Map(await query.Where(a => a.Name == name).FirstOrDefaultAsync());
     }
 }

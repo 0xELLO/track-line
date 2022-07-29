@@ -4,8 +4,10 @@ namespace App.Contracts.BLL.Services;
 
 public interface IListItemService
 {
-    public Task AddNewListItem(MinimalListItemDTO listItem);
-    public Task AddListItemToSubList(string listItemCode, string subListId);
-    public Task MoveListItemToSubList(string listItemId, string targetSubListId);
-    public Task ChangeListItemProgress(string listItemId);
+    public Task<MinimalListItemDTO> AddNewListItem(MinimalListItemDTO listItem, bool noTracking = true);
+    public Task<ExtendedListItemDTO> AddListItemToSubList(string listItemCode, string subListId, bool noTracking = true);
+    public Task MoveListItemToSubList(string listItemId, string targetSubListId, bool noTracking = true);
+    public Task ChangeListItemProgress(string listItemId, bool noTracking = true);
+
+    public Task<IEnumerable<ExtendedListItemDTO>> GetListItemsBySubList(string subListId,  bool noTracking = true);
 }

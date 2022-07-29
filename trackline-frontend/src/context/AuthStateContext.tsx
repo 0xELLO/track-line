@@ -1,7 +1,7 @@
 import React, {ReactNode, useContext, useState} from "react"
 
 const LoginStateContext = React.createContext(false)
-const LoginStateUpdateContext = React.createContext(() => {})
+const LoginStateUpdateContext = React.createContext((value: boolean) => {})
 
 export function useLogin() {
     return useContext(LoginStateContext)
@@ -14,8 +14,8 @@ export function useLoginUpdate(){
 export function LoginProvider({ children } : childrenProp) {
     const [loggedIn, setLoggedIn] = useState(false)
 
-    function toggleLoggedIn() {
-        setLoggedIn(prev => !prev)
+    function toggleLoggedIn(value: boolean) {
+        setLoggedIn(value)
     }
 
     return (
