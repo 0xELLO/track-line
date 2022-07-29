@@ -1,5 +1,6 @@
 ﻿using App.Domain;
 using App.Domain.Identity;
+using App.Domain.List;
 using Base.Domain;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +12,11 @@ public class AppDbContext : IdentityDbContext<AppUser, AppRole, Guid>
 {
     public DbSet<RefreshToken> RefreshToken { get; set; } = default!;
     public DbSet<AppUser> AppUser { get; set; } = default!;
-    public DbSet<FooBar> FooBar { get; set; } = default!;
+    public DbSet<HeadList> HeadList { get; set; } = default!;
+    public DbSet<ListItem> ListItem { get; set; } = default!;
+    public DbSet<ListItemInSubList> ListItemInSubList { get; set; } = default!;
+    public DbSet<UserListItemProgress> UserListItemProgress { get; set; } = default!;
+    
 
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {

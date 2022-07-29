@@ -27,6 +27,7 @@ function App() {
     } else {
       console.log("setting true")
       setAuthState(true)
+      console.log()
     }
   })
 
