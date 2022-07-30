@@ -1,4 +1,5 @@
 ﻿using App.DAL.EF;
+using App.Domain;
 using App.Domain.Identity;
 using App.Domain.List;
 using Microsoft.AspNetCore.Hosting;
@@ -43,10 +44,9 @@ public class CustomWebApplicationFactory<TStartup> : WebApplicationFactory<TStar
                 .GetRequiredService<ILogger<CustomWebApplicationFactory<TStartup>>>();
 
             db.Database.EnsureCreated();
-            
+            using var userManager = scopedServices.GetService<UserManager<AppUser>>();
             try
             {
-                using var userManager = scopedServices.GetService<UserManager<AppUser>>();
                 if (dbInitialized == false)
                 {
                     dbInitialized = true;
@@ -84,6 +84,7 @@ public class CustomWebApplicationFactory<TStartup> : WebApplicationFactory<TStar
                         }
                     }
                 }
+                
             }
             catch (Exception ex)
             {
@@ -93,8 +94,8 @@ public class CustomWebApplicationFactory<TStartup> : WebApplicationFactory<TStar
             
             try
             {
-                using var userManager = scopedServices.GetService<UserManager<AppUser>>();
-                var user = userManager!.FindByEmailAsync("admin@itcollege.ee").Result;
+                
+                var user = userManager!.FindByNameAsync("admin@itcollege.ee").Result;
 
                 // create items here to inject into database (standart items to test)
                 var headList = db.HeadList.Add(new HeadList
@@ -103,6 +104,13 @@ public class CustomWebApplicationFactory<TStartup> : WebApplicationFactory<TStar
                     DefaultTitle = "test123",
                 });
                 db.SaveChanges();
+                
+                var fooBar = db.FooBar.Add(new FooBar
+                {
+                    Name = "foo bar"
+                });
+                db.SaveChanges();
+ ;
 
             }
             catch (Exception ex)

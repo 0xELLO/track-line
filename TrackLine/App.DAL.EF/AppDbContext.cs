@@ -16,6 +16,7 @@ public class AppDbContext : IdentityDbContext<AppUser, AppRole, Guid>
     public DbSet<ListItem> ListItem { get; set; } = default!;
     public DbSet<ListItemInSubList> ListItemInSubList { get; set; } = default!;
     public DbSet<UserListItemProgress> UserListItemProgress { get; set; } = default!;
+    public DbSet<FooBar> FooBar { get; set; } = default!;
     
 
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
