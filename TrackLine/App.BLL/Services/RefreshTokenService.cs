@@ -17,7 +17,7 @@ public class RefreshTokenService : BaseEntityService<App.BLL.DTO.Identity.Refres
     }
     
     // TODO Fix the service (i don't know why it doesn't work)
-
+    
     public async Task<IEnumerable<RefreshTokenDTO?>> GetRefreshTokensByUserIdAsync(string appUserId, bool noTracking = true)
     {
         return (await Repository.GetRefreshTokensByUserIdAsync(appUserId)).Select(x => Mapper.Map(x));
@@ -34,9 +34,18 @@ public class RefreshTokenService : BaseEntityService<App.BLL.DTO.Identity.Refres
         bool noTracking = true)
     {
         return (await Repository.GetRefreshTokensByUserIdAsync(appUserId, noTracking))
-            .Where(x => (x!.Token == refreshToken && x.ExpirationTime > DateTime.UtcNow) ||
+            .Where(x =>
+                        (x!.Token == refreshToken && x.ExpirationTime > DateTime.UtcNow) ||
                         (x!.PreviousToken == refreshToken && x.PreviousExpirationTime > DateTime.UtcNow))
             .Select(x => Mapper.Map(x))!;
+    }
+
+    public async Task<RefreshTokenDTO> GenerateRefreshToken(string appUserId, bool noTracking = true)
+    {
+        var refreshToken = new DAL.DTO.Identity.RefreshTokenDTO();
+        refreshToken.AppUserId = Guid.Parse((ReadOnlySpan<char>)appUserId);
+        var res = Repository.Add(refreshToken);
+        return Mapper.Map(res)!;
     }
 
     public async Task RemoveInvalidUserTokensAsync(string appUserId, bool noTracking = true)

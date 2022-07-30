@@ -19,7 +19,7 @@ public class ListItemInSubListRepository: BaseEntityRepository<App.DAL.DTO.List.
     public async Task<IEnumerable<ListItemInSubListDTO>> GetAllBySubListId(string subListId, bool noTracking = true)
     {
         var query = CreateQuery(noTracking);
-        return (await query.Where(a => a.SubListId.ToString() == subListId)
+        return (await query.Where(a => a.SubListId.ToString().ToUpper() == subListId.ToUpper())
             .ToListAsync()).Select(x => Mapper.Map(x));
     }
 }

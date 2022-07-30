@@ -13,4 +13,6 @@ public interface IRefreshTokenService  : IEntityService<App.BLL.DTO.Identity.Ref
     public Task<IEnumerable<RefreshTokenDTO>> GetValidRefreshTokensByUserIdAsync(string appUserId, string refreshToken,
         bool noTracking = true);
 
+    public Task<RefreshTokenDTO> GenerateRefreshToken(string appUserId, bool noTracking = true);
+
 }

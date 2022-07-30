@@ -29,6 +29,6 @@ public class ListItemRepository: BaseEntityRepository<App.DAL.DTO.List.ListItemD
     public async Task<ListItemDTO?> GetById(string id, bool noTracking = true)
     {
         var query = CreateQuery(noTracking);
-        return (Mapper.Map(await query.FirstAsync(x => x.Id.ToString() == id)));
+        return (Mapper.Map(await query.FirstAsync(x => x.Id.ToString().ToUpper() == id.ToUpper())));
     }
 }

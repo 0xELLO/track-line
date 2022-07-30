@@ -18,7 +18,7 @@ public class RefreshTokenRepository : BaseEntityRepository<App.DAL.DTO.Identity.
         bool noTracking = true)
     {
         var query = CreateQuery(noTracking);
-        return (await query.Where(a => a.AppUserId.ToString() == appUserId)
+        return (await query.Where(a => a.AppUserId.ToString().ToUpper() == appUserId.ToUpper())
             .ToListAsync()).Select(x => Mapper.Map(x));
         
         
