@@ -8,11 +8,11 @@ namespace App.Contracts.BLL.Services;
 public interface IRefreshTokenService  : IEntityService<App.BLL.DTO.Identity.RefreshTokenDTO>,
     IRefreshTokenRepositoryCustom<App.BLL.DTO.Identity.RefreshTokenDTO>
 {
-    public Task<IEnumerable<RefreshTokenDTO>> GetValidRefreshTokensByUserIdAsync(string appUserId,
+    public Task<IEnumerable<RefreshTokenDTO>> GetValidRefreshTokensByUserIdAsync(Guid appUserId,
         bool noTracking = true);
-    public Task<IEnumerable<RefreshTokenDTO>> GetValidRefreshTokensByUserIdAsync(string appUserId, string refreshToken,
+    public Task<IEnumerable<RefreshTokenDTO>> GetValidRefreshTokensByUserIdAsync(Guid appUserId, string refreshToken,
         bool noTracking = true);
 
-    public Task<RefreshTokenDTO> GenerateRefreshToken(string appUserId, bool noTracking = true);
+    public Task<RefreshTokenDTO> GenerateRefreshToken(Guid appUserId, bool noTracking = true);
 
 }

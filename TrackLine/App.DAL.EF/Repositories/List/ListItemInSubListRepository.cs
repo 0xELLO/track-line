@@ -16,10 +16,10 @@ public class ListItemInSubListRepository: BaseEntityRepository<App.DAL.DTO.List.
     }
 
     // TODO null
-    public async Task<IEnumerable<ListItemInSubListDTO>> GetAllBySubListId(string subListId, bool noTracking = true)
+    public async Task<IEnumerable<ListItemInSubListDTO>> GetAllBySubListId(Guid subListId, bool noTracking = true)
     {
         var query = CreateQuery(noTracking);
-        return (await query.Where(a => a.SubListId.ToString().ToUpper() == subListId.ToUpper())
+        return (await query.Where(a => a.SubListId == subListId)
             .ToListAsync()).Select(x => Mapper.Map(x));
     }
 }

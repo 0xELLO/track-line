@@ -15,22 +15,21 @@ public class RefreshTokenService : BaseEntityService<App.BLL.DTO.Identity.Refres
         base(repository, mapper)
     {
     }
+    // TODO FIXED?
     
-    // TODO Fix the service (i don't know why it doesn't work)
-    
-    public async Task<IEnumerable<RefreshTokenDTO?>> GetRefreshTokensByUserIdAsync(string appUserId, bool noTracking = true)
+    public async Task<IEnumerable<RefreshTokenDTO?>> GetRefreshTokensByUserIdAsync(Guid appUserId, bool noTracking = true)
     {
         return (await Repository.GetRefreshTokensByUserIdAsync(appUserId)).Select(x => Mapper.Map(x));
     }
 
-    public async Task<IEnumerable<RefreshTokenDTO>> GetValidRefreshTokensByUserIdAsync(string appUserId,
+    public async Task<IEnumerable<RefreshTokenDTO>> GetValidRefreshTokensByUserIdAsync(Guid appUserId,
         bool noTracking = true)
     {
         await RemoveInvalidUserTokensAsync(appUserId, noTracking);
         return (await GetRefreshTokensByUserIdAsync(appUserId, noTracking))!;
     }
     
-    public async Task<IEnumerable<RefreshTokenDTO>> GetValidRefreshTokensByUserIdAsync(string appUserId, string refreshToken,
+    public async Task<IEnumerable<RefreshTokenDTO>> GetValidRefreshTokensByUserIdAsync(Guid appUserId, string refreshToken,
         bool noTracking = true)
     {
         return (await Repository.GetRefreshTokensByUserIdAsync(appUserId, noTracking))
@@ -40,15 +39,15 @@ public class RefreshTokenService : BaseEntityService<App.BLL.DTO.Identity.Refres
             .Select(x => Mapper.Map(x))!;
     }
 
-    public async Task<RefreshTokenDTO> GenerateRefreshToken(string appUserId, bool noTracking = true)
+    public async Task<RefreshTokenDTO> GenerateRefreshToken(Guid appUserId, bool noTracking = true)
     {
         var refreshToken = new DAL.DTO.Identity.RefreshTokenDTO();
-        refreshToken.AppUserId = Guid.Parse((ReadOnlySpan<char>)appUserId);
+        refreshToken.AppUserId = appUserId;
         var res = Repository.Add(refreshToken);
         return Mapper.Map(res)!;
     }
 
-    public async Task RemoveInvalidUserTokensAsync(string appUserId, bool noTracking = true)
+    public async Task RemoveInvalidUserTokensAsync(Guid appUserId, bool noTracking = true)
     {
         // TODO Will removing all invalid tokens removes posability to logging with multiple devices
         var tokens = await Repository.GetRefreshTokensByUserIdAsync(appUserId, noTracking);

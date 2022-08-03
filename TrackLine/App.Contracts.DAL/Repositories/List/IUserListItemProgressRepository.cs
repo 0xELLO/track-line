@@ -10,5 +10,5 @@ public interface IUserListItemProgressRepository: IEntityRepository<App.DAL.DTO.
 
 public interface IUserListItemProgressRepositoryCustom<TEntity>
 {
-    public Task<TEntity> GetByListObjectId(string listObjectId, bool noTracking = true);
+    public Task<TEntity> GetByListObjectId(Guid listObjectId, bool noTracking = true);
 }

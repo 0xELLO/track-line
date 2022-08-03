@@ -28,10 +28,10 @@ public class SubListController : ControllerBase
     }
     
     //api/v1/list/GetHeadLists
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<SubList>>> GetSubList(string headListId)
+    [HttpGet("{id}")]
+    public async Task<ActionResult<IEnumerable<SubList>>> GetSubList(Guid id)
     {
-        return Ok((await _bll.SubListService.getSubListsByHeadListId(headListId)).Select(x => _mapper.SubListMapper.Map(x)));
+        return Ok((await _bll.SubListService.GetAllByHeadListId(id)).Select(x => _mapper.SubListMapper.Map(x)));
     }
 
     [HttpPost]

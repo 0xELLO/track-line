@@ -133,7 +133,7 @@ public class AccountController : ControllerBase
         
         // new refresh token load
         appUser.RefreshTokens = (await _bll.RefreshTokenService
-            .GetValidRefreshTokensByUserIdAsync(appUser.Id.ToString()))
+            .GetValidRefreshTokensByUserIdAsync(appUser.Id))
             .Select(x => new RefreshToken
             {
                 Id = x.Id,
@@ -145,7 +145,7 @@ public class AccountController : ControllerBase
             }).ToList();
 
         
-        var refreshToken = await _bll.RefreshTokenService.GenerateRefreshToken(appUser.Id.ToString());
+        var refreshToken = await _bll.RefreshTokenService.GenerateRefreshToken(appUser.Id);
         await _bll.SaveChangesAsync();
 
         var res = new JwtResponse()
@@ -348,7 +348,7 @@ public class AccountController : ControllerBase
         // new load and compare refresh tokens
         
         
-        appUser.RefreshTokens = (await _bll.RefreshTokenService.GetValidRefreshTokensByUserIdAsync(appUser.Id.ToString(),
+        appUser.RefreshTokens = (await _bll.RefreshTokenService.GetValidRefreshTokensByUserIdAsync(appUser.Id,
             refreshTokenModel.RefreshToken)).Select(x => new RefreshToken
         {
             Id = x.Id,

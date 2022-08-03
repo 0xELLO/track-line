@@ -14,14 +14,15 @@ public class RefreshTokenRepository : BaseEntityRepository<App.DAL.DTO.Identity.
     {
     }
 
-    public async Task<IEnumerable<RefreshTokenDTO?>> GetRefreshTokensByUserIdAsync(string appUserId,
+    public async Task<IEnumerable<RefreshTokenDTO?>> GetRefreshTokensByUserIdAsync(Guid appUserId,
         bool noTracking = true)
     {
         var query = CreateQuery(noTracking);
-        return (await query.Where(a => a.AppUserId.ToString().ToUpper() == appUserId.ToUpper())
+        return (await query.Where(a => a.AppUserId== appUserId)
             .ToListAsync()).Select(x => Mapper.Map(x));
         
         
         // List Refresh => refresh appUserId == appUserId
     }
+    
 }
