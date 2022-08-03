@@ -10,6 +10,6 @@ public interface ISubListRepository: IEntityRepository<App.DAL.DTO.List.SubListD
 
 public interface ISubListRepositoryCustom<TEntity>
 {
-    public Task<IEnumerable<TEntity>> getSubListsByHeadListId(string headListId, bool noTracking = true);
+    public Task<IEnumerable<TEntity>> GetAllByHeadListId(Guid headListId, bool noTracking = true);
 
 }

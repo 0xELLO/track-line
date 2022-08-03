@@ -3,6 +3,7 @@ using App.Contracts.BLL.Services;
 using App.Contracts.DAL.Repositories;
 using App.Contracts.DAL.Repositories.List;
 using Base.BLL;
+using Base.Common;
 using Base.Contracts.Base;
 
 namespace App.BLL.Services;
@@ -14,10 +15,24 @@ public class HeadListService : BaseEntityService<App.BLL.DTO.List.HeadListDTO, A
     {
     }
 
-    public async Task<IEnumerable<HeadListDTO>> getHeadListsByUserId(string userId, bool noTracking = true)
+    public async Task<IEnumerable<HeadListDTO>> GetAllByUserId(Guid appUserId, bool noTracking = true)
     {
         // TODO handle null
-        Console.WriteLine(userId);
-        return (await Repository.getHeadListsByUserId(userId, noTracking)).Select(x => Mapper.Map(x));
+        return (await Repository.GetAllByUserId(appUserId, noTracking)).Select(x => Mapper.Map(x));
+    }
+
+    public async Task<IEnumerable<HeadListDTO>> GenerateDefaultHeadLists(Guid appUserId, bool noTracking = true)
+    {
+        var result = new List<HeadListDTO>();
+        foreach (var title in DefaultTitles.HeadListTitles)
+        {
+            result.Add(Mapper.Map(Repository.Add(new DAL.DTO.List.HeadListDTO
+            {
+                AppUserId = appUserId,
+                DefaultTitle = title
+            }))!);
+        }
+
+        return result;
     }
 }

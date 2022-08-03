@@ -34,7 +34,7 @@ public class HeadListController : ControllerBase
     
     //api/v1/list/GetHeadLists
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<HeadList>>> GetHeadLists([FromHeader] string authorization)
+    public async Task<ActionResult<IEnumerable<HeadList>>> GetHeadList([FromHeader] string authorization)
     {
        var appUser =  await _bll.AppUserService.GetUserFromJwt(authorization, _userManager);
        if (appUser == null)
@@ -42,7 +42,7 @@ public class HeadListController : ControllerBase
            return BadRequest();
        }
        
-       return Ok((await _bll.HeadListService.getHeadListsByUserId(appUser!.Id.ToString()))
+       return Ok((await _bll.HeadListService.GetAllByUserId(appUser.Id))
            .Select(x => _mapper.HeadListMapper.Map(x)));
     }
 
@@ -55,7 +55,7 @@ public class HeadListController : ControllerBase
             return BadRequest();
         }
 
-        headList.AppUserId = appUser.Id.ToString();
+        headList.AppUserId = appUser.Id;
         var result = _bll.HeadListService.Add(_mapper.HeadListMapper.Map(headList));
         await _bll.SaveChangesAsync();
         return Ok(_mapper.HeadListMapper.Map(result));
