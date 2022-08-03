@@ -48,7 +48,7 @@ public class AccountController : ControllerBase
     // TODO change email method
     // TODO remove context!!! + RefreshToken Service!!1 finished?
     // TODO error descriptions
-    // TODO Api error description over standard errors (do i need traceId Mark prochitai pro traceId)
+    // TODO Api error description over standard errors (do i need traceId Mark prochitai pro traceId - why not)
 
     /// <summary>
     /// AppUser authentication 
@@ -234,7 +234,8 @@ public class AccountController : ControllerBase
             }
         };
         
-        // TODO rewrite mail validation
+        // DONE: TO\DO rewrite mail validation
+        // Verified the method, it looks fine. However we could start sending verification email whenever we create a SNMP server.
         var trimmedEmail = appUser.Email.Trim();
         try {
             var addr = new System.Net.Mail.MailAddress(appUser.Email);
