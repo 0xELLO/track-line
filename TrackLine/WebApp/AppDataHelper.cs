@@ -1,4 +1,6 @@
-﻿using App.DAL.EF;
+﻿using App.BLL;
+using App.Contracts.BLL;
+using App.DAL.EF;
 using App.Domain;
 using App.Domain.Identity;
 using Base.Common;
@@ -20,6 +22,7 @@ public static class AppDataHelper
             .CreateScope();
 
         using var context = serviceScope.ServiceProvider.GetService<AppDbContext>();
+        var bll = serviceScope.ServiceProvider.GetService<IAppBLL>();
 
         if (context == null)
         {
@@ -101,6 +104,14 @@ public static class AppDataHelper
                     {
                         throw new ApplicationException("Cannot create user!");
                     }
+                    var headLists =  bll!.HeadListService.GenerateDefaultHeadLists(user.Id);
+                    bll.SaveChanges();
+                    foreach (var list in headLists.Result)
+                    {
+                        bll.SubListService.GenerateDefaultSubLists(list.Id);
+                    }
+
+                    bll.SaveChanges();
                 }
 
                 if (!string.IsNullOrWhiteSpace(userInfo.roles))
