@@ -278,6 +278,16 @@ public class AccountController : ControllerBase
             return NotFound("User/Password problem");
         }
         
+        // generate Default lists
+        var headLists = await _bll.HeadListService.GenerateDefaultHeadLists(appUser.Id);
+        await _bll.SaveChangesAsync();
+        foreach (var list in headLists)
+        {
+            await _bll.SubListService.GenerateDefaultSubLists(list.Id);
+        }
+
+        await _bll.SaveChangesAsync();
+        
         // generate jwt
         var jwt = IdentityExtensions.GenerateJwt(
             claimsPrincipal.Claims,

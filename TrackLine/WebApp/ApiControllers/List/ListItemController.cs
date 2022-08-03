@@ -28,10 +28,10 @@ public class ListItemController : ControllerBase
         return Ok();
     }
 
-    [HttpGet("subListId")]
-    public async Task<ActionResult<IEnumerable<ExtendedListItem>>> GetExtendedListItems(Guid subListId)
+    [HttpGet("id")]
+    public async Task<ActionResult<IEnumerable<ExtendedListItem>>> GetExtendedListItems(Guid id)
     {
-        var result = await _bll.ListItemService.GetListItemsBySubList(subListId);
+        var result = await _bll.ListItemService.GetListItemsBySubList(id);
         return Ok(result);
     }
 
