@@ -32,7 +32,7 @@ public class ListItemService : IListItemService
     public async Task<ExtendedListItemDTO> AddListItemToSubList(string listItemCode, Guid subListId, bool noTracking = true)
     {
         var listItem = new ListItemDTO();
-        if ((!await _listItemRepository.Exists(listItemCode, noTracking)))
+        if (!(await _listItemRepository.Exists(listItemCode, noTracking)))
         {
             // TODO search service dependency
         }
@@ -44,7 +44,7 @@ public class ListItemService : IListItemService
         _listItemInSubListRepository.Add(new ListItemInSubListDTO
         {
             SubListId = subListId,
-            ListObjectId = listItem.Id,
+            ListItemId = listItem.Id,
             Position = 1
         });
         await FixPosition(subListId);

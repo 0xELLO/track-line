@@ -18,6 +18,6 @@ public static class DefaultTitles
     
     public static readonly List<string> SubListTitles = new List<string>
     {
-        AnimeTitle, BookTitle, FilmTitle, SeriesTitle
+        TodoTitle, OnHoldTitle, PlanTitle
     };
 }

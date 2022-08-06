@@ -10,7 +10,7 @@ public class ListItemInSubList : DomainEntityMetaId
 
     // FK ListObject
     public ListItem ListItem { get; set; } = default!;
-    public Guid ListObjectId { get; set; } = default!;
+    public Guid ListItemId { get; set; } = default!;
 
     // Position in sublist
     public int Position { get; set; } = default!;
