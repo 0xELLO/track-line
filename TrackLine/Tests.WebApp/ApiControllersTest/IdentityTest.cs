@@ -84,7 +84,7 @@ public class IdentityTest : IClassFixture<CustomWebApplicationFactory<Program>>
 
         var refreshTokenModel = new RefreshTokenModel
         {
-            Jwt = resultJwt!.Token,
+            Jwt = resultJwt!.JWT,
             RefreshToken = resultJwt!.RefreshToken
         };
 
@@ -97,7 +97,7 @@ public class IdentityTest : IClassFixture<CustomWebApplicationFactory<Program>>
         
         refreshRequest.EnsureSuccessStatusCode();
         
-        Assert.NotEqual(refreshedJwt!.Token,resultJwt!.Token);
+        Assert.NotEqual(refreshedJwt!.JWT,resultJwt!.JWT);
         
     }
 }
