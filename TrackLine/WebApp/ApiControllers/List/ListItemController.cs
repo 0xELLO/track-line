@@ -28,10 +28,10 @@ public class ListItemController : ControllerBase
         return Ok();
     }
 
-    [HttpGet("subListId")]
-    public async Task<ActionResult<IEnumerable<ExtendedListItem>>> GetExtendedListItems(string subListId)
+    [HttpGet("id")]
+    public async Task<ActionResult<IEnumerable<ExtendedListItem>>> GetExtendedListItems(Guid id)
     {
-        var result = await _bll.ListItemService.GetListItemsBySubList(subListId);
+        var result = await _bll.ListItemService.GetListItemsBySubList(id);
         return Ok(result);
     }
 
@@ -42,7 +42,7 @@ public class ListItemController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<ExtendedListItem>> AddListItemToSubList(string listItemCode, string subListId)
+    public async Task<ActionResult<ExtendedListItem>> AddListItemToSubList(string listItemCode, Guid subListId)
     {
         var res = await _bll.ListItemService.AddListItemToSubList(listItemCode, subListId);
         await _bll.SaveChangesAsync();

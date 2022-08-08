@@ -14,10 +14,10 @@ public class HeadListRepository : BaseEntityRepository<App.DAL.DTO.List.HeadList
     {
     }
 
-    public async Task<IEnumerable<HeadListDTO>> getHeadListsByUserId(string userId, bool noTracking = true)
+    public async Task<IEnumerable<HeadListDTO>> GetAllByUserId(Guid appUserId, bool noTracking = true)
     {
         var query = CreateQuery(noTracking);
-        return (await query.Where(a => a.AppUserId.ToString().ToUpper() == userId.ToUpper())
+        return (await query.Where(a => a.AppUserId == appUserId)
             .ToListAsync()).Select(x => Mapper.Map(x));
     }
 }

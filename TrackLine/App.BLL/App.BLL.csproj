@@ -18,6 +18,7 @@
       <ProjectReference Include="..\App.DAL.DTO\App.DAL.DTO.csproj" />
       <ProjectReference Include="..\App.Domain\App.Domain.csproj" />
       <ProjectReference Include="..\Base.BLL\Base.BLL.csproj" />
+      <ProjectReference Include="..\Base.Common\Base.Common.csproj" />
       <ProjectReference Include="..\Base.DAL\Base.DAL.csproj" />
     </ItemGroup>
 

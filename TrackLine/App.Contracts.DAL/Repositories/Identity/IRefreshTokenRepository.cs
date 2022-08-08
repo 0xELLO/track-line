@@ -10,5 +10,5 @@ public interface IRefreshTokenRepository : IEntityRepository<App.DAL.DTO.Identit
 
 public interface IRefreshTokenRepositoryCustom<TEntity>
 {
-    Task<IEnumerable<TEntity?>> GetRefreshTokensByUserIdAsync(string appUserId, bool noTracking = true);
+    Task<IEnumerable<TEntity?>> GetRefreshTokensByUserIdAsync(Guid appUserId, bool noTracking = true);
 }

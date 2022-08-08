@@ -29,10 +29,10 @@ public class ListItemService : IListItemService
         return _mapper.Map(_listItemRepository.Add(_mapper.Map(listItem)!))!;;
     }
 
-    public async Task<ExtendedListItemDTO> AddListItemToSubList(string listItemCode, string subListId, bool noTracking = true)
+    public async Task<ExtendedListItemDTO> AddListItemToSubList(string listItemCode, Guid subListId, bool noTracking = true)
     {
         var listItem = new ListItemDTO();
-        if ((!await _listItemRepository.Exists(listItemCode, noTracking)))
+        if (!(await _listItemRepository.Exists(listItemCode, noTracking)))
         {
             // TODO search service dependency
         }
@@ -43,8 +43,8 @@ public class ListItemService : IListItemService
         
         _listItemInSubListRepository.Add(new ListItemInSubListDTO
         {
-            SubListId = Guid.Parse(subListId),
-            ListObjectId = listItem.Id,
+            SubListId = subListId,
+            ListItemId = listItem.Id,
             Position = 1
         });
         await FixPosition(subListId);
@@ -63,7 +63,7 @@ public class ListItemService : IListItemService
         };
     }
 
-    private async Task FixPosition(string subListId)
+    private async Task FixPosition(Guid subListId)
     {
         var listItems = await _listItemInSubListRepository.GetAllBySubListId(subListId);
         listItems = listItems.OrderBy(x => x.Position);
@@ -79,27 +79,27 @@ public class ListItemService : IListItemService
         }
     }
 
-    public Task MoveListItemToSubList(string listItemId, string targetSubListId, bool noTracking = true)
+    public Task MoveListItemToSubList(Guid listItemId, Guid targetSubListId, bool noTracking = true)
     {
         throw new NotImplementedException();
     }
 
-    public Task ChangeListItemProgress(string listItemId, bool noTracking = true)
+    public Task ChangeListItemProgress(Guid listItemId, bool noTracking = true)
     {
         throw new NotImplementedException();
         
     }
     
 
-     public async Task<IEnumerable<ExtendedListItemDTO>> GetListItemsBySubList(string subListId, bool noTracking)
+     public async Task<IEnumerable<ExtendedListItemDTO>> GetListItemsBySubList(Guid subListId, bool noTracking)
      {
          var items = await _listItemInSubListRepository.GetAllBySubListId(subListId);
          var eListItems = new List<ExtendedListItemDTO>();
          
          foreach (var item in items)
          {
-             var listItem = await _listItemRepository.GetById(item.Id.ToString());
-             var progress = await _userListItemProgressRepository.GetByListObjectId(listItem!.Id.ToString());
+             var listItem = await _listItemRepository.GetById(item.Id);
+             var progress = await _userListItemProgressRepository.GetByListObjectId(listItem!.Id);
              // TODO automapper merge two objects together
              // Mapper https://entityframeworkcore.com/knowledge-base/43614417/merge-multiple-sources-into-a-single-destination
              eListItems.Add(new ExtendedListItemDTO

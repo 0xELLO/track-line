@@ -15,5 +15,5 @@ public interface IListItemRepositoryCustom<TEntity>
 
     public Task<TEntity?> GetByCode(string code, bool noTracking = true);
 
-    public Task<TEntity?> GetById(string id, bool noTracking = true);
+    public Task<TEntity?> GetById(Guid id, bool noTracking = true);
 }
