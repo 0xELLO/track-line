@@ -1,27 +1,21 @@
 ﻿namespace Base.Common;
 
+// TODO Delete these if not needed
 public static class ApiErrorDescription
 {
-    public const string EmailValidationErrorDescription = "Email not valid";
-    public const string PasswordValidationErrorDescription = "Password not valid";
-    public const string EmailOrPasswordProblemDescription = "Email or password problem";
-    public const string EmailAlreadyRegisteredDescription = "Email already registered";
+    public const string EmailValidationErrorDescription = "An error occured during email validation. Please verify your email address.";
+    public const string UsernameValidationErrorDescription = "An error occured during email validation. Please verify your email address.";
+    public const string PasswordValidationErrorDescription = "An error occured during password validation. Please verify your password.";
+    public const string MultipleProblemDescription = "An error occured during email or password validation.";
+    public const string EmailAlreadyRegisteredDescription = "Email is already registered. Please use another email address.";
 }
 
-public static class ApiErrorSource
+public enum ApiErrorSource
 {
-    public const string EmailSource = "Email";
-    public const string PasswordSource = "Password";
-    public const string EmailOrPasswordSource = "Email/Password";
-}
-
-public static class ApiErrorTitle
-{
-    public const string ValidationErrorTitle = "Validation error";
-    public const string EmailValidationErrorTitle = "Email validation error";
-    public const string PasswordValidationErrorTitle = "Password validation error";
-    public const string MultipleValidationErrorTitle = "Multiple validation errors";
-    public const string AppUserValidationErrorTitle = "AppUser validation error";
+    EmailSource,
+    UsernameSource,
+    PasswordSource,
+    MultipleSource
 }
 
 public static class ApiErrorType
