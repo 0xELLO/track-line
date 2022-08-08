@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System.Collections;
+using System.Data;
 using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
@@ -12,8 +13,8 @@ using Base.Common;
 using Base.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
+using WebApp.ApiControllers.Helpers;
 
 namespace WebApp.ApiControllers.Identity;
 /// <summary>
@@ -48,7 +49,7 @@ public class AccountController : ControllerBase
     // TODO change email method
     // TODO remove context!!! + RefreshToken Service!!1 finished?
     // TODO error descriptions
-    // TODO Api error description over standard errors (do i need traceId Mark prochitai pro traceId)
+    // TODO Api error description over standard errors (do i need traceId Mark prochitai pro traceId - why not)
 
     /// <summary>
     /// AppUser authentication 
@@ -64,14 +65,14 @@ public class AccountController : ControllerBase
         var validationError = new RestApiErrorResponse
         {
             Type = ApiErrorType.BadRequestType,
-            Title = ApiErrorTitle.ValidationErrorTitle,
             Status = (int) HttpStatusCode.NotFound,
             TraceId = Activity.Current?.Id ?? HttpContext.TraceIdentifier,
             Errors =
             {
-                [ApiErrorSource.EmailOrPasswordSource] = new List<string>()
+                // TODO Edit this part
+                [ApiErrorSource.MultipleSource.ToString()] =
                 {
-                    ApiErrorDescription.EmailOrPasswordProblemDescription
+                    //ApiErrorDescription.MultipleProblemDescription.ToString()
                 }
             }
         };
@@ -111,25 +112,6 @@ public class AccountController : ControllerBase
             _configuration["JWT:Issuer"],
             DateTime.Now.AddMinutes(_configuration.GetValue<int>("JWT:ExpireInMinutes"))
             );
-
-        // old refresh token load
-        /*
-        appUser.RefreshTokens = await _context
-            .Entry(appUser)
-            .Collection(a => a.RefreshTokens!)
-            .Query()
-            .Where(t => t.AppUserId == appUser.Id)
-            .ToListAsync();
-            
-        foreach (var appUserRefreshToken in appUser.RefreshTokens)
-        {
-            if (appUserRefreshToken.ExpirationTime < DateTime.UtcNow
-                && appUserRefreshToken.PreviousExpirationTime < DateTime.UtcNow)
-            {
-                _context.RefreshToken.Remove(appUserRefreshToken);
-            }
-        }
-        */
         
         // new refresh token load
         appUser.RefreshTokens = (await _bll.RefreshTokenService
@@ -150,9 +132,9 @@ public class AccountController : ControllerBase
 
         var res = new JwtResponse()
         {
-            Token = jwt,
+            JWT = jwt,
             RefreshToken = refreshToken.Token,
-            Email = appUser.Email
+            Username = appUser.UserName
         };
         return Ok(res);
     }
@@ -168,32 +150,12 @@ public class AccountController : ControllerBase
     [SwaggerResponse(200, "Authentication successful")]
     public async Task<ActionResult<JwtResponse>> Register(RegistrationModel registrationData)
     {
-        // verify user
-        var appUser = await _userManager.FindByEmailAsync(registrationData.Email);
-        if (appUser != null)
-        {
-            _logger.LogWarning("WebApi login failed password for email {} ", registrationData.Email);
-            var error = new RestApiErrorResponse
-            {
-                Type = ApiErrorType.BadRequestType,
-                Title = ApiErrorTitle.EmailValidationErrorTitle,
-                Status = (int) HttpStatusCode.BadRequest,
-                TraceId = Activity.Current?.Id ?? HttpContext.TraceIdentifier,
-                Errors =
-                {
-                    [ApiErrorSource.EmailSource] = new List<string>()
-                    {
-                        ApiErrorDescription.EmailAlreadyRegisteredDescription
-                    }
-                }
-            };
-            return BadRequest(error);
-        }
+        var errorBuilder = new ErrorBuilder();
 
         var refreshToken = new RefreshToken();
-        appUser = new AppUser()
+        var appUser = new AppUser()
         {
-            UserName = registrationData.Email,
+            UserName = registrationData.Username,
             Email = registrationData.Email, 
             RefreshTokens = new List<RefreshToken>()
             {
@@ -201,80 +163,80 @@ public class AccountController : ControllerBase
             }
         };
         
-        // validate
+        // user validation
+        var userValidator = new UserValidator<AppUser>();
+        var userValidatorRes = await userValidator.ValidateAsync(_userManager, appUser);
+        if (!userValidatorRes.Succeeded)
+        {
+            var error = errorBuilder.ErrorResponse(Activity.Current?.Id ?? HttpContext.TraceIdentifier, userValidatorRes.Errors);
+            return BadRequest(error);
+        }
+        
+        // custom email verification
+        var trimmedEmail = appUser.Email.Trim();
+        if (trimmedEmail.EndsWith("."))
+        {
+            var identityError = new IdentityError() 
+            {
+                Code = "InvalidEmail",
+                Description = $"Email '{appUser.Email}' is invalid."
+            };
+            
+            var error = errorBuilder.ErrorResponse(Activity.Current?.Id ?? HttpContext.TraceIdentifier, new List<IdentityError>() { identityError });
+            return BadRequest(error);
+        }
+        
+        // password validation
         var passwordValidator = new PasswordValidator<AppUser>();
         var passwordValidationRes = await passwordValidator.ValidateAsync(_userManager, appUser, registrationData.Password);
         if (!passwordValidationRes.Succeeded)
         {
-            return BadRequest(new RestApiErrorResponse
-            {
-                Type = ApiErrorType.BadRequestType,
-                Title = ApiErrorTitle.PasswordValidationErrorTitle,
-                Status = (int) HttpStatusCode.BadRequest,
-                TraceId = Activity.Current?.Id ?? HttpContext.TraceIdentifier,
-                Errors =
-                {
-                    [ApiErrorSource.PasswordSource] = passwordValidationRes.Errors.Select(e => e.Description).ToList()
-                }
-            });
+            var error = errorBuilder.ErrorResponse(Activity.Current?.Id ?? HttpContext.TraceIdentifier, passwordValidationRes.Errors);
+            return BadRequest(error);
         }
-        
-        var badEmailError = new RestApiErrorResponse
-        {
-            Type = ApiErrorType.BadRequestType,
-            Title = ApiErrorTitle.EmailValidationErrorTitle,
-            Status = (int) HttpStatusCode.BadRequest,
-            TraceId = Activity.Current?.Id ?? HttpContext.TraceIdentifier,
-            Errors =
-            {
-               [ApiErrorSource.EmailSource] = new List<string>
-                {
-                    ApiErrorDescription.EmailValidationErrorDescription
-                }
-            }
-        };
-        
-        // TODO rewrite mail validation
-        var trimmedEmail = appUser.Email.Trim();
-        try {
-            var addr = new System.Net.Mail.MailAddress(appUser.Email);
-            if (addr.Address != trimmedEmail || trimmedEmail.EndsWith("."))
-            {
-                return BadRequest(badEmailError);
-            }
-        }
-        catch {
-            return BadRequest(badEmailError);
-        }
-        
+
         // create user (system will do it)
-        var result = await _userManager.CreateAsync(appUser, registrationData.Password);
-        if (!result.Succeeded)
+        var createUserRes = await _userManager.CreateAsync(appUser, registrationData.Password);
+        if (!createUserRes.Succeeded)
         {
-            return BadRequest(result.Errors.FirstOrDefault());
+            return BadRequest(createUserRes.Errors.FirstOrDefault());
         }
         
         // add role user (system will do it)
-        var result2 = await _userManager.AddToRoleAsync(appUser, AppUserRoles.User.ToString());
-        if (!result2.Succeeded)
+        var addToRoleRes = await _userManager.AddToRoleAsync(appUser, AppUserRoles.User.ToString());
+        if (!addToRoleRes.Succeeded)
         {
-            return BadRequest(result2.Errors.FirstOrDefault());
+            return BadRequest(addToRoleRes.Errors.FirstOrDefault());
         }
         
-        // get full user from system with fixed ddata
+        // get full user from system with fixed data
         appUser = await _userManager.FindByEmailAsync(appUser.Email);
         if (appUser == null)
         {
-            _logger.LogWarning("User with email {} is not found after the registration", registrationData.Email);
-            return BadRequest($"User with email { registrationData.Email } is not found after the registration");
+            //_logger.LogWarning("User with email {} is not found after the registration.", registrationData.Email);
+            var identityError = new IdentityError() 
+            {
+                Code = "AccountNotFound",
+                Description = $"User with email '{registrationData.Email}' is not found after the registration."
+            };
+            
+            var error = errorBuilder.ErrorResponse(Activity.Current?.Id ?? HttpContext.TraceIdentifier, new List<IdentityError>() { identityError });
+            return BadRequest(error);
         }
 
         // get claims based user
         var claimsPrincipal = await _signInManager.CreateUserPrincipalAsync(appUser);
         if (claimsPrincipal == null)
         {
-            _logger.LogWarning("Could not get claimsPrincipal for user {}", registrationData.Email);
-            return NotFound("User/Password problem");
+            //_logger.LogWarning("Could not get claimsPrincipal for user {}", registrationData.Email);
+            var identityError = new IdentityError() 
+            {
+                Code = "ClaimsPrincipalError",
+                Description = $"Could not get claimsPrincipal for user '{registrationData.Email}'."
+            };
+            
+            var error = errorBuilder.ErrorResponse(Activity.Current?.Id ?? HttpContext.TraceIdentifier, new List<IdentityError>() { identityError });
+            return BadRequest(error);
         }
         
         // generate Default lists
@@ -295,11 +257,12 @@ public class AccountController : ControllerBase
             _configuration["JWT:Issuer"],
             DateTime.Now.AddMinutes(_configuration.GetValue<int>("JWT:ExpireInMinutes"))
         );
+        
         var res = new JwtResponse()
         {
-            Token = jwt,
+            JWT = jwt,
             RefreshToken = refreshToken.Token,
-            Email = appUser.Email
+            Username = appUser.UserName
         };
         return Ok(res);
     }
@@ -420,9 +383,9 @@ public class AccountController : ControllerBase
         
         var res = new JwtResponse()
         {
-            Token = jwt,
+            JWT = jwt,
             RefreshToken = refreshToken.Token,
-            Email = appUser.Email
+            Username = appUser.UserName
         };
         return Ok(res);
     }

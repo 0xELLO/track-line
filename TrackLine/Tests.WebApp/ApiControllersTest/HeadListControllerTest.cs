@@ -73,7 +73,7 @@ public class HeadListControllerTest: IClassFixture<CustomWebApplicationFactory<P
         var apiRequest = new HttpRequestMessage();
         apiRequest.Method = HttpMethod.Get;
         apiRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-        apiRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", resultJwt!.Token);
+        apiRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", resultJwt!.JWT);
         apiRequest.RequestUri = new Uri(_client.BaseAddress + url);
         
         // ACT
@@ -134,7 +134,7 @@ public class HeadListControllerTest: IClassFixture<CustomWebApplicationFactory<P
         var apiRequest = new HttpRequestMessage();
         apiRequest.Method = HttpMethod.Post;
         apiRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-        apiRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", resultJwt!.Token);
+        apiRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", resultJwt!.JWT);
         apiRequest.RequestUri = new Uri(_client.BaseAddress + url);
         apiRequest.Content = JsonContent.Create(headList);
 
