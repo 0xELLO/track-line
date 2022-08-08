@@ -8,7 +8,7 @@ public class ListItemInSubListDTO : DomainEntityId
     public Guid SubListId { get; set; } = default!;
 
     // FK ListObject
-    public Guid ListObjectId { get; set; } = default!;
+    public Guid ListItemId { get; set; } = default!;
 
     // Position in sublist
     public int Position { get; set; } = default!;

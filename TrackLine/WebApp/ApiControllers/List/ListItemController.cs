@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace WebApp.ApiControllers.List;
 
 [ApiVersion("1.0")]
-[Route("api/v{version:apiVersion}/[controller]/[action]")]
+[Route("api/v{version:apiVersion}/list/[controller]/[action]")]
 [ApiController]
 public class ListItemController : ControllerBase
 {
@@ -21,11 +21,11 @@ public class ListItemController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateListItem(MinimalListItem minimalListItem)
+    public async Task<ActionResult<MinimalListItem>> CreateListItem(MinimalListItem minimalListItem)
     {
         var result = await _bll.ListItemService.AddNewListItem(_mapper.MinimalListItemMapper.Map(minimalListItem));
         await _bll.SaveChangesAsync();
-        return Ok();
+        return Ok(result);
     }
 
     [HttpGet("id")]

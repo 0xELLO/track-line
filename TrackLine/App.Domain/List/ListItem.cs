@@ -26,7 +26,7 @@ public class ListItem : DomainEntityMetaId
     // Is created by user or recieved externaly
     public bool IsCreatedByUser { get; set; } = false;
 
-    public List<ListItemInSubList>? ListObjectsInSubList { get; set; }
-    public List<UserListItemProgress>? UserListObjectProgresses { get; set; }
+    public List<ListItemInSubList>? ListItemsInSubList { get; set; }
+    public List<UserListItemProgress>? UserListItemProgresses { get; set; }
 
 }

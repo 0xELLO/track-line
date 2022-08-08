@@ -16,5 +16,5 @@ public class SubList : DomainEntityMetaId
     // Public list can be saw by other users
     public bool IsPublic { get; set; } = false;
     
-    public List<ListItemInSubList>? ListObjectsInSubList { get; set; }
+    public List<ListItemInSubList>? ListItemsInSubList { get; set; }
 }

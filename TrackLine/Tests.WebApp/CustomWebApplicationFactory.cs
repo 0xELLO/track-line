@@ -2,6 +2,7 @@
 using App.Domain;
 using App.Domain.Identity;
 using App.Domain.List;
+using Base.Common;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -45,6 +46,7 @@ public class CustomWebApplicationFactory<TStartup> : WebApplicationFactory<TStar
 
             db.Database.EnsureCreated();
             using var userManager = scopedServices.GetService<UserManager<AppUser>>();
+            using var roleManager = scopedServices.GetService<RoleManager<AppRole>>();
             try
             {
                 if (dbInitialized == false)
@@ -110,7 +112,30 @@ public class CustomWebApplicationFactory<TStartup> : WebApplicationFactory<TStar
                     Name = "foo bar"
                 });
                 db.SaveChanges();
- ;
+                
+                var roles = new string[]
+                {
+                    AppUserRoles.Admin.ToString(),
+                    AppUserRoles.User.ToString()
+                };
+
+                foreach (var roleInfo in roles)
+                {
+                    var role = roleManager!.FindByNameAsync(roleInfo).Result;
+                    if (role == null)
+                    {
+                        var identityResult = roleManager.CreateAsync(new AppRole()
+                        {
+                            Name = roleInfo,
+                        }).Result;
+
+                        if (!identityResult.Succeeded)
+                        {
+                            throw new ApplicationException("Role creation failed");
+                        }
+                    }
+                }
+                db.SaveChanges();
 
             }
             catch (Exception ex)
