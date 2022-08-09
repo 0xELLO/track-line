@@ -31,7 +31,7 @@ public class IdentityTest : IClassFixture<CustomWebApplicationFactory<Program>>
 
     public LoginModel loginfo = new LoginModel()
             {
-                Email = "pipiund@kaki.land",
+                EmailOrUsername = "pipiund@kaki.land",
                 Password = "FeetArEcooL1."
             };
 

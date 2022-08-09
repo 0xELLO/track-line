@@ -45,11 +45,8 @@ public class AccountController : ControllerBase
     }
     
     // TODO change password method
-    // TODO change username?? method (firstly add username)
     // TODO change email method
     // TODO remove context!!! + RefreshToken Service!!1 finished?
-    // TODO error descriptions
-    // TODO Api error description over standard errors (do i need traceId Mark prochitai pro traceId - why not)
 
     /// <summary>
     /// AppUser authentication 
@@ -61,47 +58,77 @@ public class AccountController : ControllerBase
     [SwaggerResponse(200, "Authentication successful")]
     public async Task<ActionResult<JwtResponse>> LogIn([FromBody]LoginModel loginModelData)
     {
-        // standard password/email validation error (reusable)
-        var validationError = new RestApiErrorResponse
-        {
-            Type = ApiErrorType.BadRequestType,
-            Status = (int) HttpStatusCode.NotFound,
-            TraceId = Activity.Current?.Id ?? HttpContext.TraceIdentifier,
-            Errors =
-            {
-                // TODO Edit this part
-                [ApiErrorSource.MultipleSource.ToString()] =
-                {
-                    //ApiErrorDescription.MultipleProblemDescription.ToString()
-                }
-            }
-        };
+        var errorBuilder = new ErrorBuilder();
+        var loginMethod = LoginMethod.Email;
         
-        // verify username
-        var appUser = await _userManager.FindByEmailAsync(loginModelData.Email);
-        if (appUser == null)
+        // TODO forbid '@' for usernames
+        if (!loginModelData.EmailOrUsername.Contains("@")) loginMethod = LoginMethod.Username; 
+
+        var appUser = await _userManager.FindByEmailAsync(loginModelData.EmailOrUsername);
+        
+        if (loginMethod == LoginMethod.Username)
         {
-            _logger.LogWarning("WebApi login failed email {} not found", loginModelData.Email);
-            await Task.Delay(_rnd.Next(100, 1000));
-            return NotFound(validationError);
+            appUser = await _userManager.FindByNameAsync(loginModelData.EmailOrUsername);
         }
         
-        // verify username and password
-        var result = await _signInManager.CheckPasswordSignInAsync(appUser, loginModelData.Password, false);
-        if (!result.Succeeded)
+        if (appUser == null)
         {
-            _logger.LogWarning("WebApi login failed password for email {} ", loginModelData.Email);
-            await Task.Delay(_rnd.Next(100, 1000));
-            return NotFound(validationError);
-        } 
+            var identityError = new IdentityError() 
+            {
+                Code = "InvalidCredentials",
+                Description = $"Invalid credentials for user '{loginModelData.EmailOrUsername}'."
+            };
+            
+            var error = errorBuilder.ErrorResponse(Activity.Current?.Id ?? HttpContext.TraceIdentifier, new List<IdentityError>() { identityError });
+            return BadRequest(error);
+        }
         
+        // user validation
+        var userValidator = new UserValidator<AppUser>();
+        var userValidatorRes = await userValidator.ValidateAsync(_userManager, appUser);
+        
+        if (!userValidatorRes.Succeeded)
+        {
+            await Task.Delay(_rnd.Next(100, 1000));
+            var identityError = new IdentityError() 
+            {
+                Code = "InvalidCredentials",
+                Description = $"Invalid credentials for user '{loginModelData.EmailOrUsername}'."
+            };
+            
+            var error = errorBuilder.ErrorResponse(Activity.Current?.Id ?? HttpContext.TraceIdentifier, new List<IdentityError>() { identityError });
+            return BadRequest(error);
+        }
+        
+        // password validation
+        // TODO implement lockoutOnFailure
+        var passwordValidationRes = await _signInManager.PasswordSignInAsync(appUser, loginModelData.Password, loginModelData.RememberMe, false);
+        if (!passwordValidationRes.Succeeded)
+        {
+            await Task.Delay(_rnd.Next(100, 1000));
+            var identityError = new IdentityError() 
+            {
+                Code = "InvalidCredentials",
+                Description = $"Invalid credentials for user '{loginModelData.EmailOrUsername}'."
+            };
+            
+            var error = errorBuilder.ErrorResponse(Activity.Current?.Id ?? HttpContext.TraceIdentifier, new List<IdentityError>() { identityError });
+            return BadRequest(error);
+        }
+
         // get claims based user
         var claimsPrincipal = await _signInManager.CreateUserPrincipalAsync(appUser);
         if (claimsPrincipal == null)
         {
-            _logger.LogWarning("Could not get claimsPrincipal for user {}", loginModelData.Email);
             await Task.Delay(_rnd.Next(100, 1000));
-            return NotFound(validationError);
+            var identityError = new IdentityError() 
+            {
+                Code = "InvalidCredentials",
+                Description = $"Invalid credentials for user '{loginModelData.EmailOrUsername}'."
+            };
+            
+            var error = errorBuilder.ErrorResponse(Activity.Current?.Id ?? HttpContext.TraceIdentifier, new List<IdentityError>() { identityError });
+            return BadRequest(error);
         }
         
         // generate jwt
@@ -136,6 +163,7 @@ public class AccountController : ControllerBase
             RefreshToken = refreshToken.Token,
             Username = appUser.UserName
         };
+        
         return Ok(res);
     }
     
@@ -213,7 +241,6 @@ public class AccountController : ControllerBase
         appUser = await _userManager.FindByEmailAsync(appUser.Email);
         if (appUser == null)
         {
-            //_logger.LogWarning("User with email {} is not found after the registration.", registrationData.Email);
             var identityError = new IdentityError() 
             {
                 Code = "AccountNotFound",
@@ -307,20 +334,8 @@ public class AccountController : ControllerBase
         {
             return BadRequest($"User with email {userEmail} not found");
         }
-
-        // old load and compare refresh tokens
-        /*
-        await _context.Entry(appUser).Collection(u => u.RefreshTokens!)
-            .Query()
-            .Where(x =>
-                (x.Token == refreshTokenModel.RefreshToken && x.ExpirationTime > DateTime.UtcNow) ||
-                (x.PreviousToken == refreshTokenModel.RefreshToken && x.PreviousExpirationTime > DateTime.UtcNow))
-            .ToListAsync();
-        */
         
         // new load and compare refresh tokens
-        
-        
         appUser.RefreshTokens = (await _bll.RefreshTokenService.GetValidRefreshTokensByUserIdAsync(appUser.Id,
             refreshTokenModel.RefreshToken)).Select(x => new RefreshToken
         {
@@ -347,9 +362,7 @@ public class AccountController : ControllerBase
         {
             return Problem("More then one valid refresh token found");
         }
-        
-        // generate new jwt
-        
+
         // get claims based user
         var claimsPrincipal = await _signInManager.CreateUserPrincipalAsync(appUser);
         if (claimsPrincipal == null)

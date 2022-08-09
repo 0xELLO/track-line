@@ -81,11 +81,11 @@ public static class AppDataHelper
                 }
             }
 
-            var users = new (string username, string password, string roles)[]
+            var users = new (string email, string username, string password, string roles)[]
             {
-                ("admin@itcollege.ee", "Password.1", AppUserRoles.Admin.ToString() + "," + AppUserRoles.User.ToString()),
-                ("user@itcollege.ee", "Password.1", AppUserRoles.User.ToString()),
-                ("newuser@itcollege.ee", "Password.1", ""),
+                ("admin@itcollege.ee", "admin", "Password.1", AppUserRoles.Admin.ToString() + "," + AppUserRoles.User.ToString()),
+                ("user@itcollege.ee", "user", "Password.1", AppUserRoles.User.ToString()),
+                ("newuser@itcollege.ee", "newuser", "Password.1", ""),
             };
 
             foreach (var userInfo in users)
@@ -95,7 +95,7 @@ public static class AppDataHelper
                 {
                     user = new AppUser()
                     {
-                        Email = userInfo.username,
+                        Email = userInfo.email,
                         UserName = userInfo.username,
                         EmailConfirmed = true
                     };
