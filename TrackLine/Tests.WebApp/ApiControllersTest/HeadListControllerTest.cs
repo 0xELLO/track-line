@@ -42,7 +42,7 @@ public class HeadListControllerTest: IClassFixture<CustomWebApplicationFactory<P
         // ARRANGE
         var loginDto = new LoginModel()
         {
-            Email = "admin@itcollege.ee",
+            EmailOrUsername = "admin@itcollege.ee",
             Password = "Password.1"
         };
 
@@ -98,7 +98,7 @@ public class HeadListControllerTest: IClassFixture<CustomWebApplicationFactory<P
         // ARRANGE
         var loginDto = new LoginModel()
         {
-            Email = "admin@itcollege.ee",
+            EmailOrUsername = "admin@itcollege.ee",
             Password = "Password.1"
         };
 
