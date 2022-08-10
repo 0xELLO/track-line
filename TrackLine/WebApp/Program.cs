@@ -57,10 +57,19 @@ builder.Services.Configure<IdentityOptions>(options =>
     // Password settings        
     options.Password.RequireDigit = true;
     options.Password.RequiredLength = 6;
-    options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequireUppercase = false;
-    options.Password.RequireLowercase = false;
+    options.Password.RequireNonAlphanumeric = false; // will we?
+    options.Password.RequireUppercase = true;
+    options.Password.RequireLowercase = true;
     options.Password.RequiredUniqueChars = 1;
+    
+    // Lockout settings
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+    options.Lockout.MaxFailedAccessAttempts = 5;
+    options.Lockout.AllowedForNewUsers = true;
+
+    // User settings
+    options.User.RequireUniqueEmail = true;
+    options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_";
 });
 
 // Add JWT authenticator
