@@ -1,9 +1,12 @@
 ﻿using System.Collections;
+using System.Configuration;
 using System.Data;
 using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Security.Claims;
+using System.Security.Principal;
+using System.Text;
 using App.Contracts.BLL;
 using App.DAL.EF;
 using App.Domain.Identity;
@@ -13,6 +16,7 @@ using Base.Common;
 using Base.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using Swashbuckle.AspNetCore.Annotations;
 using WebApp.ApiControllers.Helpers;
 
@@ -61,7 +65,6 @@ public class AccountController : ControllerBase
         var errorBuilder = new ErrorBuilder();
         var loginMethod = LoginMethod.Email;
         
-        // TODO forbid '@' for usernames
         if (!loginModelData.EmailOrUsername.Contains("@")) loginMethod = LoginMethod.Username; 
 
         var appUser = await _userManager.FindByEmailAsync(loginModelData.EmailOrUsername);
@@ -101,8 +104,7 @@ public class AccountController : ControllerBase
         }
         
         // password validation
-        // TODO implement lockoutOnFailure
-        var passwordValidationRes = await _signInManager.PasswordSignInAsync(appUser, loginModelData.Password, loginModelData.RememberMe, false);
+        var passwordValidationRes = await _signInManager.PasswordSignInAsync(appUser, loginModelData.Password, loginModelData.RememberMe, true);
         if (!passwordValidationRes.Succeeded)
         {
             await Task.Delay(_rnd.Next(100, 1000));
@@ -111,6 +113,15 @@ public class AccountController : ControllerBase
                 Code = "InvalidCredentials",
                 Description = $"Invalid credentials for user '{loginModelData.EmailOrUsername}'."
             };
+            if (passwordValidationRes.IsLockedOut)
+            {
+                // TODO Make the error more user-friendly. Somehow get the time when the lock out is finished?
+                identityError = new IdentityError() 
+                {
+                    Code = "UserLockedOut",
+                    Description = $"User '{loginModelData.EmailOrUsername}' is locked out. Please try again later."
+                };
+            }
             
             var error = errorBuilder.ErrorResponse(Activity.Current?.Id ?? HttpContext.TraceIdentifier, new List<IdentityError>() { identityError });
             return BadRequest(error);
@@ -255,7 +266,6 @@ public class AccountController : ControllerBase
         var claimsPrincipal = await _signInManager.CreateUserPrincipalAsync(appUser);
         if (claimsPrincipal == null)
         {
-            //_logger.LogWarning("Could not get claimsPrincipal for user {}", registrationData.Email);
             var identityError = new IdentityError() 
             {
                 Code = "ClaimsPrincipalError",
@@ -293,7 +303,7 @@ public class AccountController : ControllerBase
         };
         return Ok(res);
     }
-    
+
     /// <summary>
     /// Refreshes JWT token
     /// </summary>
@@ -304,35 +314,95 @@ public class AccountController : ControllerBase
     [ProducesResponseType(200)]
     public async Task<ActionResult> RefreshToken([FromBody] RefreshTokenModel refreshTokenModel)
     {
+        var errorBuilder = new ErrorBuilder();
+
         // get info from JWT
-        JwtSecurityToken jwtToken;
+        //JwtSecurityToken jwtToken;
         try
         {
-            jwtToken = new JwtSecurityTokenHandler().ReadJwtToken(refreshTokenModel.Jwt);
-            if (jwtToken == null)
+            //jwtToken = new JwtSecurityTokenHandler().ReadJwtToken(refreshTokenModel.Jwt);
+            //if (jwtToken == null)
+            if (refreshTokenModel.Jwt == null)
             {
-                return BadRequest("No token");
+                var identityError = new IdentityError() 
+                {
+                    Code = "RefreshTokenError",
+                    Description = "No token found, please try again."
+                };
+            
+                var error = errorBuilder.ErrorResponse(Activity.Current?.Id ?? HttpContext.TraceIdentifier, new List<IdentityError>() { identityError });
+                return BadRequest(error);
             }
         }
         catch (Exception e)
         {
-            return BadRequest($"Can't parse the token {e.Message}");
+            // TODO should we parse e.Message in prod?
+            var identityError = new IdentityError() 
+            {
+                Code = "RefreshTokenError",
+                Description = $"Could not parse the token '{e.Message}'." 
+            };
+            
+            var error = errorBuilder.ErrorResponse(Activity.Current?.Id ?? HttpContext.TraceIdentifier, new List<IdentityError>() { identityError });
+            return BadRequest(error);
         }
         
-        // TODO: validate token signature
-        // https://stackoverflow.com/questions/49407749/jwt-token-validation-in-asp-net
         // validate token siganture
-        var userEmail = jwtToken.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Email)?.Value;
-        if (userEmail == null)
+        string userEmail;
+        var token = refreshTokenModel.Jwt;
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var key = Encoding.ASCII.GetBytes(_configuration.GetValue<string>("JWT:Key"));
+        try
         {
-            return BadRequest("No email");
+            tokenHandler.ValidateToken(token, new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                ClockSkew = TimeSpan.Zero
+            }, out SecurityToken validatedToken);
+
+            var jwtToken = (JwtSecurityToken) validatedToken;
+            userEmail = jwtToken.Claims.First(x => x.Type == ClaimTypes.Email).Value;
+        }
+        catch
+        {
+            var identityError = new IdentityError() 
+            {
+                Code = "RefreshTokenError",
+                Description = "Something went wrong while Refresh Token validation." 
+            };
+            
+            var error = errorBuilder.ErrorResponse(Activity.Current?.Id ?? HttpContext.TraceIdentifier, new List<IdentityError>() { identityError });
+            return BadRequest(error); 
+        }
+        
+        // verify that userEmail has some data
+        if (userEmail == null || userEmail == "")
+        {
+            var identityError = new IdentityError() 
+            {
+                Code = "RefreshTokenError",
+                Description = "Something went wrong while Refresh Token validation." 
+            };
+            
+            var error = errorBuilder.ErrorResponse(Activity.Current?.Id ?? HttpContext.TraceIdentifier, new List<IdentityError>() { identityError });
+            return BadRequest(error);
         }
         
         // get user and tokens
         var appUser = await _userManager.FindByEmailAsync(userEmail);
         if (appUser == null)
         {
-            return BadRequest($"User with email {userEmail} not found");
+            var identityError = new IdentityError() 
+            {
+                Code = "RefreshTokenError",
+                Description = "Something went wrong while Refresh Token validation." 
+            };
+            
+            var error = errorBuilder.ErrorResponse(Activity.Current?.Id ?? HttpContext.TraceIdentifier, new List<IdentityError>() { identityError });
+            return BadRequest(error);
         }
         
         // new load and compare refresh tokens
@@ -350,25 +420,52 @@ public class AccountController : ControllerBase
         
         if (appUser.RefreshTokens == null)
         {
-            return Problem("RefreshTokens collection is null");
+            var identityError = new IdentityError() 
+            {
+                Code = "RefreshTokenError",
+                Description = "RefreshTokens collection is null." 
+            };
+            
+            var error = errorBuilder.ErrorResponse(Activity.Current?.Id ?? HttpContext.TraceIdentifier, new List<IdentityError>() { identityError });
+            return BadRequest(error);
         }
         
         if (appUser.RefreshTokens.Count == 0)
         {
-            return Problem("No valid refresh tokens found, collection in empty");
+            var identityError = new IdentityError() 
+            {
+                Code = "RefreshTokenError",
+                Description = "No valid refresh tokens found, collection in empty." 
+            };
+            
+            var error = errorBuilder.ErrorResponse(Activity.Current?.Id ?? HttpContext.TraceIdentifier, new List<IdentityError>() { identityError });
+            return BadRequest(error);
         }
         
         if (appUser.RefreshTokens.Count != 1)
         {
-            return Problem("More then one valid refresh token found");
+            var identityError = new IdentityError() 
+            {
+                Code = "RefreshTokenError",
+                Description = "More then one valid refresh token found." 
+            };
+            
+            var error = errorBuilder.ErrorResponse(Activity.Current?.Id ?? HttpContext.TraceIdentifier, new List<IdentityError>() { identityError });
+            return BadRequest(error);
         }
 
         // get claims based user
         var claimsPrincipal = await _signInManager.CreateUserPrincipalAsync(appUser);
         if (claimsPrincipal == null)
         {
-            _logger.LogWarning("Could not get claimsPrincipal for user {}", userEmail);
-            return NotFound("User/Password problem");
+            var identityError = new IdentityError() 
+            {
+                Code = "ClaimsPrincipalError",
+                Description = $"Could not get claimsPrincipal for user {userEmail}." 
+            };
+            
+            var error = errorBuilder.ErrorResponse(Activity.Current?.Id ?? HttpContext.TraceIdentifier, new List<IdentityError>() { identityError });
+            return BadRequest(error);
         }
         
         // generate jwt
@@ -392,7 +489,6 @@ public class AccountController : ControllerBase
 
             await _context.SaveChangesAsync();
         }
-  
         
         var res = new JwtResponse()
         {
