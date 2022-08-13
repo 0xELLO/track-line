@@ -29,34 +29,80 @@ public class IdentityTest : IClassFixture<CustomWebApplicationFactory<Program>>
         );
     }
 
-    public LoginModel loginfo = new LoginModel()
-            {
-                EmailOrUsername = "pipiund@kaki.land",
-                Password = "FeetArEcooL1."
-            };
-
-    [Fact]
-    public async Task HappyAccountRegister()
+    private readonly RegistrationModel reginfo = new RegistrationModel
     {
+        Email = "pipiund@kaki.land",
+        Username = "Rei_is_Cool",
+        Password = "FeetArEcooL1."
+    };
 
-        var logToJson = JsonSerializer.Serialize(loginfo); 
+    private readonly LoginModel loginfoemail = new LoginModel()
+    {
+        EmailOrUsername = "pipiund@kaki.land",
+        Password = "FeetArEcooL1.",
+        RememberMe = true
+    };
+
+    private readonly LoginModel loginfouser = new LoginModel
+    {
+        EmailOrUsername = "Rei_is_Cool",
+        Password = "FeetArEcooL1.",
+        RememberMe = true
+    };
+
+    public async Task AccountRegister(RegistrationModel regdata)
+    {   
+        var logToJson = JsonSerializer.Serialize(regdata);
         var jsonData = new StringContent(logToJson, Encoding.UTF8, "application/json");
 
         var request = await _client.PostAsync("/api/v1/identity/Account/Register/", jsonData);
 
         request.EnsureSuccessStatusCode();
+        
+    }
+
+    [Fact]
+    public async Task HappyAccountRegister()
+    {
+        
+        var logToJson = JsonSerializer.Serialize(reginfo);
+        var jsonData = new StringContent(logToJson, Encoding.UTF8, "application/json");
+
+        var request = await _client.PostAsync("/api/v1/identity/Account/Register/", jsonData);
+
+        
+        
 
         var requestContent = await request.Content.ReadAsStringAsync();
         var resultJwt = System.Text.Json.JsonSerializer.Deserialize<JwtResponse>(requestContent,
             new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+        _testOutputHelper.WriteLine(request.ToJson());
         Assert.NotNull(resultJwt);
+        request.EnsureSuccessStatusCode();
     }
 
+    // [Fact]
+    // public async void HappyUserAuthName() // needs to be optimised
+    // {
+    //     await AccountRegister(reginfo);
+    //     var logToJson = JsonSerializer.Serialize(loginfouser);
+    //     var jsonData = new StringContent(logToJson, Encoding.UTF8, "application/json");
+    //
+    //     var request = await _client.PostAsync("/api/v1/identity/Account/LogIn", jsonData);
+    //
+    //     request.EnsureSuccessStatusCode();
+    //
+    //     var requestContent = await request.Content.ReadAsStringAsync();
+    //     var resultJwt = System.Text.Json.JsonSerializer.Deserialize<JwtResponse>(requestContent,
+    //         new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+    //     Assert.NotNull(resultJwt);
+    // }
+
     [Fact]
-    public async void HappyUserAuth()// needs to be optimised
+    public async void HappyUserAuthEmail()
     {
-        await HappyAccountRegister();
-        var logToJson = JsonSerializer.Serialize(loginfo);
+        await AccountRegister(reginfo);
+        var logToJson = JsonSerializer.Serialize(loginfoemail);
         var jsonData = new StringContent(logToJson, Encoding.UTF8, "application/json");
 
         var request = await _client.PostAsync("/api/v1/identity/Account/LogIn", jsonData);
@@ -67,12 +113,14 @@ public class IdentityTest : IClassFixture<CustomWebApplicationFactory<Program>>
         var resultJwt = System.Text.Json.JsonSerializer.Deserialize<JwtResponse>(requestContent,
             new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
         Assert.NotNull(resultJwt);
+        
     }
+
 
     [Fact]
     public async void RefreshJwtToken()// needs to be heavily optimised
     {
-        var logToJson = JsonSerializer.Serialize(loginfo); 
+        var logToJson = JsonSerializer.Serialize(reginfo); 
         var jsonData = new StringContent(logToJson, Encoding.UTF8, "application/json");
         var request = await _client.PostAsync("/api/v1/identity/Account/Register/", jsonData);
 
@@ -97,7 +145,7 @@ public class IdentityTest : IClassFixture<CustomWebApplicationFactory<Program>>
         
         refreshRequest.EnsureSuccessStatusCode();
         
-        Assert.NotEqual(refreshedJwt!.JWT,resultJwt!.JWT);
+        Assert.NotEqual(resultJwt!.JWT,refreshedJwt!.JWT);
         
     }
 }
