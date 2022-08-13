@@ -14,4 +14,5 @@ public interface IAppBLL : IBLL
     IHeadListService HeadListService { get; }
     
     IAppUserService AppUserService { get; }
+    ISearchService SearchService { get; }
 }

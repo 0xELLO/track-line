@@ -57,6 +57,10 @@ public class AppBLL : BaseBLL<IAppUnitOfWork>, IAppBLL
 
     private IAppUserService? _appUserService;
     public IAppUserService AppUserService => _appUserService ??= new AppUserService();
+    
+    
+    private ISearchService? _searchService;
+    public ISearchService SearchService => _searchService ??= new SearchService(UnitOfWork.ListItemRepository);
 
 }
 

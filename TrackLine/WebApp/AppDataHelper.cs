@@ -3,6 +3,7 @@ using App.Contracts.BLL;
 using App.DAL.EF;
 using App.Domain;
 using App.Domain.Identity;
+using App.Domain.List;
 using Base.Common;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -126,9 +127,24 @@ public static class AppDataHelper
         // Seeds default data
         if (configuration.GetValue<bool>("DataInitialization:SeedData"))
         {
-            
-            context.SaveChanges();
-            
+            Random rnd = new Random();
+            //Dictionary of strings
+            string[] words = { "Harry Potter", "Harry", "Potter", "Harry Potter 2",
+                "harry potter and the prisoner of azkaban", "Harry Potter: prizoner", "Dummy", "Harold", "Harrington",
+                "Potion", "Friend", "Friends", "Friend and Mew" };
+            //Random number from - to
+            foreach (var word in words)
+            {
+                context.ListItem.Add(new ListItem
+                {
+                    DefaultTitle = word,
+                    Code = rnd.Next(2000, 3000).ToString(),
+                    TotalLength = 0,
+                    IsPublic = true,
+                    IsCreatedByUser = true,
+                });
+                context.SaveChanges();
+            }
         }
     }
 }
