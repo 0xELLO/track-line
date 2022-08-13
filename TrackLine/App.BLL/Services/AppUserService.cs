@@ -8,7 +8,7 @@ namespace App.BLL.Services;
 
 public class AppUserService : IAppUserService
 {
-    // TODO ????
+    // TODO depricated
     public async Task<AppUser?> GetUserFromJwt(string authorization, UserManager<AppUser> userManager)
     {
         var token = authorization.Substring("Bearer ".Length);

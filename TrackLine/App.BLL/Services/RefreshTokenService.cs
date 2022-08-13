@@ -15,13 +15,23 @@ public class RefreshTokenService : BaseEntityService<App.BLL.DTO.Identity.Refres
         base(repository, mapper)
     {
     }
-    // TODO FIXED?
-    
+    /// <summary>
+    /// Gets all AppUser Refresh tokens
+    /// </summary>
+    /// <param name="appUserId"></param>
+    /// <param name="noTracking"></param>
+    /// <returns></returns>
     public async Task<IEnumerable<RefreshTokenDTO?>> GetRefreshTokensByUserIdAsync(Guid appUserId, bool noTracking = true)
     {
         return (await Repository.GetRefreshTokensByUserIdAsync(appUserId)).Select(x => Mapper.Map(x));
     }
-
+    
+    /// <summary>
+    /// Removes invalid/expired refresh tokens and return all valid
+    /// </summary>
+    /// <param name="appUserId"></param>
+    /// <param name="noTracking"></param>
+    /// <returns></returns>
     public async Task<IEnumerable<RefreshTokenDTO>> GetValidRefreshTokensByUserIdAsync(Guid appUserId,
         bool noTracking = true)
     {
@@ -29,6 +39,14 @@ public class RefreshTokenService : BaseEntityService<App.BLL.DTO.Identity.Refres
         return (await GetRefreshTokensByUserIdAsync(appUserId, noTracking))!;
     }
     
+    // TODO May be not neccecery/duplicated by other methods
+    /// <summary>
+    /// Gets only valid tokens than match old token
+    /// </summary>
+    /// <param name="appUserId"></param>
+    /// <param name="refreshToken"></param>
+    /// <param name="noTracking"></param>
+    /// <returns></returns>
     public async Task<IEnumerable<RefreshTokenDTO>> GetValidRefreshTokensByUserIdAsync(Guid appUserId, string refreshToken,
         bool noTracking = true)
     {
@@ -38,7 +56,13 @@ public class RefreshTokenService : BaseEntityService<App.BLL.DTO.Identity.Refres
                         (x!.PreviousToken == refreshToken && x.PreviousExpirationTime > DateTime.UtcNow))
             .Select(x => Mapper.Map(x))!;
     }
-
+    
+    /// <summary>
+    /// Generates new refresh Token 
+    /// </summary>
+    /// <param name="appUserId"></param>
+    /// <param name="noTracking"></param>
+    /// <returns></returns>
     public async Task<RefreshTokenDTO> GenerateRefreshToken(Guid appUserId, bool noTracking = true)
     {
         var refreshToken = new DAL.DTO.Identity.RefreshTokenDTO();
@@ -46,7 +70,12 @@ public class RefreshTokenService : BaseEntityService<App.BLL.DTO.Identity.Refres
         var res = Repository.Add(refreshToken);
         return Mapper.Map(res)!;
     }
-
+    
+    /// <summary>
+    /// Removes all invalid refresh Tokens
+    /// </summary>
+    /// <param name="appUserId"></param>
+    /// <param name="noTracking"></param>
     public async Task RemoveInvalidUserTokensAsync(Guid appUserId, bool noTracking = true)
     {
         // TODO Will removing all invalid tokens removes posability to logging with multiple devices

@@ -20,7 +20,13 @@ public class HeadListService : BaseEntityService<App.BLL.DTO.List.HeadListDTO, A
         // TODO handle null
         return (await Repository.GetAllByUserId(appUserId, noTracking)).Select(x => Mapper.Map(x));
     }
-
+    
+    /// <summary>
+    /// Generates default headLists for new AppUser
+    /// </summary>
+    /// <param name="appUserId"></param>
+    /// <param name="noTracking"></param>
+    /// <returns></returns>
     public async Task<IEnumerable<HeadListDTO>> GenerateDefaultHeadLists(Guid appUserId, bool noTracking = true)
     {
         var result = new List<HeadListDTO>();

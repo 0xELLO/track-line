@@ -15,10 +15,10 @@ public class UserListItemProgressRepository: BaseEntityRepository<App.DAL.DTO.Li
     {
     }
     
-    public async Task<UserListItemProgressDTO> GetByListObjectId(Guid listObjectId, bool noTracking = true)
+    public async Task<UserListItemProgressDTO> GetByListItemId(Guid listItemId, bool noTracking = true)
     {
         var query = CreateQuery(noTracking);
         //var a = await query.FirstAsync(a => a.ListObjectId.ToString() == listObjectId);
-        return Mapper.Map(await query.FirstAsync(a => a.ListObjectId == listObjectId))!;
+        return Mapper.Map(await query.FirstAsync(a => a.ListItemId == listItemId))!;
     }
 }

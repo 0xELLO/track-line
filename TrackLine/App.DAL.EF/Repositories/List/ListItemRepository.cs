@@ -31,4 +31,9 @@ public class ListItemRepository: BaseEntityRepository<App.DAL.DTO.List.ListItemD
         var query = CreateQuery(noTracking);
         return (Mapper.Map(await query.FirstAsync(x => x.Id == id)));
     }
+    public async Task<IEnumerable<ListItemDTO>> GetAllPublic(bool noTracking = true)
+    {
+        var query = CreateQuery(noTracking);
+        return query.Where(x => x.IsPublic).Select(x => Mapper.Map(x));
+    }
 }

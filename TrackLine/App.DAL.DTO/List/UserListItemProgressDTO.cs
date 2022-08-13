@@ -5,7 +5,7 @@ namespace App.DAL.DTO.List;
 public class UserListItemProgressDTO : DomainEntityId
 {
     // FK ListObject
-    public Guid ListObjectId { get; set; } = default!;
+    public Guid ListItemId { get; set; } = default!;
     
     // FK AppUser
     public Guid AppUserId { get; set; } = default!;

@@ -343,9 +343,6 @@ namespace App.DAL.EF.Migrations
                     b.Property<Guid>("ListItemId")
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("ListObjectId")
-                        .HasColumnType("TEXT");
-
                     b.Property<int>("Progress")
                         .HasColumnType("INTEGER");
 

@@ -49,6 +49,9 @@ public class FooBarController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<App.Public.DTO.v1.FooBar>>> GetFooBar()
     {
+        var id =  Guid.Parse(this.User.Claims.First(i => i.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier").Value);
+        Console.WriteLine(id);
+        
         var fooBarBll = (await _bll.FooBarService.GetAllAsync());
         var fooBar = fooBarBll.Select(bll => _mapper.FooBarMapper.Map(bll));    
         return Ok(fooBar);

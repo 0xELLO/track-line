@@ -16,6 +16,7 @@ IFooBarService
     public async Task<IEnumerable<FooBar?>> GetAllByNameAsync(string name, bool noTracking = true)
     {
         return (await Repository.GetAllByNameAsync(name, noTracking)).Select(x => Mapper.Map(x));
+
     }
 
     public async Task<FooBar?> GetByNameAsync(string name, bool noTracking = true)
