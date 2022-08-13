@@ -35,6 +35,36 @@ public class HeadListControllerTest: IClassFixture<CustomWebApplicationFactory<P
     }
 
     [Fact]
+    public async Task Test_1()
+    {
+        var loginDto = new LoginModel()
+        {
+            EmailOrUsername = "test@123.c",
+            Password = "Password.1"
+        };
+
+        var jsonStr = JsonSerializer.Serialize(loginDto);
+        var data = new StringContent(jsonStr, Encoding.UTF8, "application/json");
+        
+        // ACT
+        var response = await _client.PostAsync("/api/v1/identity/Account/Register", data);
+        
+        // ASSERT
+        //response.EnsureSuccessStatusCode();
+        
+        var requestContent = await response.Content.ReadAsStringAsync();
+        _testOutputHelper.WriteLine(requestContent);
+
+
+        var resultJwt = System.Text.Json.JsonSerializer.Deserialize<JwtResponse>(
+            requestContent,
+            new JsonSerializerOptions() {PropertyNamingPolicy = JsonNamingPolicy.CamelCase}
+        );
+        
+        Assert.NotNull(resultJwt);
+    }
+
+    [Fact]
     public async Task Api_Get_HeadLists()
     {
         
@@ -91,7 +121,8 @@ public class HeadListControllerTest: IClassFixture<CustomWebApplicationFactory<P
         Assert.NotEqual(headListsResult!.FirstOrDefault()!.Id, Guid.Empty);
         Assert.Matches(headListsResult!.FirstOrDefault()!.DefaultTitle, "test123");
     }
-
+    
+    [Fact]
     async Task Api_Post_HeadList()
     {
         // ========== LOGIN ===========
